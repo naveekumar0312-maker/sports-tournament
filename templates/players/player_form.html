@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-9 col-md-10">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="bg-navy p-4 text-white">
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-user-pen text-warning me-2"></i>{{ title }}</h3>
+                <p class="small text-slate-300 mb-0">Update your personal details, location, playing style, and profile photo.</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Non-Field Errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger shadow-sm border-0 mb-4">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0 small"><i class="fa-solid fa-circle-exclamation me-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Personal Information Section -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-id-card text-purple me-2"></i>Personal & Contact Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Name *</label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}<div class="text-danger small mt-1">{{ form.full_name.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Mobile Number *</label>
+                            {{ form.mobile_number }}
+                            {% if form.mobile_number.errors %}<div class="text-danger small mt-1">{{ form.mobile_number.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                            {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Gender</label>
+                            {{ form.gender }}
+                            {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Profile Photo</label>
+                            {{ form.profile_photo }}
+                            {% if form.profile_photo.errors %}<div class="text-danger small mt-1">{{ form.profile_photo.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tamil Nadu Location Section -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-location-dot text-danger me-2"></i>Tamil Nadu Location</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">District</label>
+                            {{ form.district }}
+                            {% if form.district.errors %}<div class="text-danger small mt-1">{{ form.district.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Taluk / Sub-District</label>
+                            {{ form.taluk }}
+                            {% if form.taluk.errors %}<div class="text-danger small mt-1">{{ form.taluk.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Village</label>
+                            {{ form.village }}
+                            {% if form.village.errors %}<div class="text-danger small mt-1">{{ form.village.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Cricket Role & Playing Specifications -->
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-baseball-bat-ball text-warning me-2"></i>Cricket Role & Specifications</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Playing Role *</label>
+                            {{ form.playing_role }}
+                            {% if form.playing_role.errors %}<div class="text-danger small mt-1">{{ form.playing_role.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Primary Role</label>
+                            {{ form.primary_role }}
+                            {% if form.primary_role.errors %}<div class="text-danger small mt-1">{{ form.primary_role.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Secondary Role</label>
+                            {{ form.secondary_role }}
+                            {% if form.secondary_role.errors %}<div class="text-danger small mt-1">{{ form.secondary_role.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Batting Style</label>
+                            {{ form.batting_style }}
+                            {% if form.batting_style.errors %}<div class="text-danger small mt-1">{{ form.batting_style.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Batting Position</label>
+                            {{ form.batting_position }}
+                            {% if form.batting_position.errors %}<div class="text-danger small mt-1">{{ form.batting_position.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Bowling Style</label>
+                            {{ form.bowling_style }}
+                            {% if form.bowling_style.errors %}<div class="text-danger small mt-1">{{ form.bowling_style.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Bowling Type</label>
+                            {{ form.bowling_type }}
+                            {% if form.bowling_type.errors %}<div class="text-danger small mt-1">{{ form.bowling_type.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Jersey Number</label>
+                            {{ form.jersey_number }}
+                            {% if form.jersey_number.errors %}<div class="text-danger small mt-1">{{ form.jersey_number.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Playing Experience (Years)</label>
+                            {{ form.playing_experience_years }}
+                            {% if form.playing_experience_years.errors %}<div class="text-danger small mt-1">{{ form.playing_experience_years.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Preferred Position / Spec</label>
+                            {{ form.preferred_position }}
+                            {% if form.preferred_position.errors %}<div class="text-danger small mt-1">{{ form.preferred_position.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Player Biography / About</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}<div class="text-danger small mt-1">{{ form.bio.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-emerald w-100 py-3 rounded-pill shadow">
+                        <i class="fa-solid fa-save me-2"></i> Save Profile Details
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

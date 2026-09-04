@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Tournaments | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-navy mb-1"><i class="fa-solid fa-trophy text-warning me-2"></i>Cricket Tournaments Catalog</h2>
+        <p class="text-muted small mb-0">Discover and register for ongoing & upcoming cricket championships in Tamil Nadu.</p>
+    </div>
+    {% if user.is_organizer_role or user.is_admin_role %}
+        <a href="{% url 'tournament_create' %}" class="btn btn-emerald rounded-pill px-4 shadow">
+            <i class="fa-solid fa-plus-circle me-1"></i> Create Tournament
+        </a>
+    {% endif %}
+</div>
+
+<!-- Filters Bar -->
+<div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+    <form method="get" action="{% url 'tournament_list' %}" class="row g-3 align-items-center">
+        <div class="col-md-3">
+            <input type="text" name="q" class="form-control" placeholder="Search tournament name..." value="{{ search_query|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <select name="district" id="id_district" class="form-select">
+                <option value="">-- All Districts --</option>
+                {% for d in districts %}
+                    <option value="{{ d.id }}" {% if selected_district == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="taluk" id="id_taluk" class="form-select" data-selected="{{ selected_taluk|default:'' }}">
+                <option value="">-- All Taluks --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="village" id="id_village" class="form-select" data-selected="{{ selected_village|default:'' }}">
+                <option value="">-- All Villages --</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-navy text-white rounded-pill px-3 w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+            <a href="{% url 'tournament_list' %}" class="btn btn-outline-secondary rounded-pill"><i class="fa-solid fa-rotate-left"></i></a>
+        </div>
+    </form>
+</div>
+
+
+<!-- Tournaments Grid -->
+<div class="row g-4">
+    {% for t in tournaments %}
+        <div class="col-md-6 col-lg-4">
+            <div class="tournament-card h-100 d-flex flex-column">
+                <div class="tournament-banner-placeholder">
+                    <i class="fa-solid fa-trophy fs-1 opacity-50"></i>
+                </div>
+                <div class="p-4 d-flex flex-column flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge badge-status 
+                            {% if t.status == 'ONGOING' %}badge-ongoing
+                            {% elif t.status == 'REGISTRATION_OPEN' %}badge-registration-open
+                            {% else %}badge-upcoming{% endif %}">
+                            {{ t.get_status_display }}
+                        </span>
+                        <span class="small text-muted fw-bold"><i class="fa-solid fa-location-dot me-1 text-danger"></i>{{ t.district.name }}</span>
+                    </div>
+
+                    <h5 class="fw-bold mb-2 text-navy">{{ t.name }}</h5>
+                    <p class="text-muted small line-clamp-2 mb-3">{{ t.description|truncatewords:15 }}</p>
+
+                    <div class="bg-light p-2.5 rounded-3 mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted"><i class="fa-solid fa-baseball-bat-ball me-1"></i>Format:</span>
+                            <span class="fw-bold text-navy">{{ t.get_tournament_type_display }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted"><i class="fa-solid fa-indian-rupee-sign me-1"></i>Entry Fee:</span>
+                            <span class="fw-bold text-success">₹{{ t.entry_fee|floatformat:0 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted"><i class="fa-solid fa-users me-1"></i>Teams:</span>
+                            <span class="fw-semibold">{{ t.registered_teams_count }} / {{ t.max_teams }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto">
+                        <a href="{% url 'tournament_detail' t.id %}" class="btn btn-emerald w-100 rounded-pill">View Details & Fixtures</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-trophy-slash fs-1 text-muted mb-3 d-block"></i>
+            <h5 class="fw-bold">No Tournaments Found</h5>
+            <p class="text-muted">Try adjusting your filters or create a new tournament.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

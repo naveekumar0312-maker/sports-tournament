@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}38 Tamil Nadu Districts | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="mb-4 text-center text-md-start">
+    <h2 class="fw-bold text-navy mb-1"><i class="fa-solid fa-map-location-dot text-danger me-2"></i>Tamil Nadu District Cricket Network</h2>
+    <p class="text-muted">Explore active cricket tournaments, clubs, taluks, and players across all 38 revenue districts of Tamil Nadu.</p>
+</div>
+
+<div class="row g-3">
+    {% for dist in districts %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-3 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold text-navy mb-0"><i class="fa-solid fa-location-dot text-danger me-2"></i>{{ dist.name }}</h5>
+                    <span class="badge bg-secondary">{{ dist.region|default:"Tamil Nadu" }} Zone</span>
+                </div>
+                
+                <p class="small text-muted mb-2">
+                    <strong>Taluks:</strong> 
+                    {% for taluk in dist.taluks.all %}
+                        {{ taluk.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Standard District Taluks
+                    {% endfor %}
+                </p>
+
+                <div class="d-flex justify-content-between text-muted small bg-light p-2 rounded mt-auto">
+                    <span><i class="fa-solid fa-trophy text-warning me-1"></i>{{ dist.tournaments.count }} Tournaments</span>
+                    <span><i class="fa-solid fa-people-group text-primary me-1"></i>{{ dist.teams.count }} Teams</span>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-4">No district data found.</div>
+    {% endfor %}
+</div>
+{% endblock %}

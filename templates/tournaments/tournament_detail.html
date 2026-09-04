@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tournament.name }} | Sports Tournament{% endblock %}
+
+{% block content %}
+<!-- Tournament Banner Header -->
+<div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+    <div class="bg-navy p-4 p-md-5 text-white position-relative">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <span class="badge badge-status fs-6 
+                {% if tournament.status == 'ONGOING' %}badge-ongoing
+                {% elif tournament.status == 'REGISTRATION_OPEN' %}badge-registration-open
+                {% else %}badge-upcoming{% endif %}">
+                {{ tournament.get_status_display }}
+            </span>
+            <span class="badge bg-light text-dark fs-6"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ tournament.district.name }}{% if tournament.taluk %}, {{ tournament.taluk.name }}{% endif %}</span>
+        </div>
+
+        <h1 class="fw-bold display-6 mb-2">{{ tournament.name }}</h1>
+        <p class="text-slate-300 fs-5 mb-3"><i class="fa-solid fa-map-pin me-2 text-warning"></i>{{ tournament.venue }}</p>
+
+        <div class="d-flex flex-wrap gap-4 text-slate-200 small">
+            <div><i class="fa-solid fa-calendar me-1 text-emerald"></i> <strong>Start:</strong> {{ tournament.start_date|date:"d M, Y" }}</div>
+            <div><i class="fa-solid fa-calendar-check me-1 text-emerald"></i> <strong>End:</strong> {{ tournament.end_date|date:"d M, Y" }}</div>
+            <div><i class="fa-solid fa-indian-rupee-sign me-1 text-warning"></i> <strong>Entry Fee:</strong> ₹{{ tournament.entry_fee|floatformat:0 }}</div>
+            <div><i class="fa-solid fa-users me-1 text-info"></i> <strong>Capacity:</strong> {{ tournament.registered_teams_count }} / {{ tournament.max_teams }} Teams</div>
+        </div>
+
+        {% if user == tournament.organizer or user.is_admin_role %}
+            <div class="mt-4 d-flex gap-2">
+                <a href="{% url 'tournament_edit' tournament.id %}" class="btn btn-outline-light rounded-pill"><i class="fa-solid fa-pen me-1"></i> Edit Tournament</a>
+                <a href="{% url 'match_create' tournament.id %}" class="btn btn-gold rounded-pill"><i class="fa-solid fa-plus me-1"></i> Schedule Fixture</a>
+                <a href="{% url 'prize_create' tournament.id %}" class="btn btn-emerald rounded-pill"><i class="fa-solid fa-award me-1"></i> Add Prize</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-pills nav-fill bg-white p-2 rounded-4 shadow-sm mb-4" id="tournamentTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active fw-bold" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">
+            <i class="fa-solid fa-circle-info me-1"></i> Overview
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-bold" id="fixtures-tab" data-bs-toggle="tab" data-bs-target="#fixtures" type="button">
+            <i class="fa-solid fa-baseball-bat-ball me-1"></i> Fixtures & Scores ({{ matches.count }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-bold" id="teams-tab" data-bs-toggle="tab" data-bs-target="#teams" type="button">
+            <i class="fa-solid fa-people-group me-1"></i> Registered Teams ({{ registrations.count }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link fw-bold" id="prizes-tab" data-bs-toggle="tab" data-bs-target="#prizes" type="button">
+            <i class="fa-solid fa-award me-1"></i> Prizes & Awards ({{ prizes.count }})
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Contents -->
+<div class="tab-content" id="tournamentTabsContent">
+    
+    <!-- 1. Overview Tab -->
+    <div class="tab-pane fade show active" id="overview">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-navy mb-3">About the Tournament</h5>
+                    <p class="text-muted leading-relaxed">{{ tournament.description|linebreaks }}</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Registration Box -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-ticket text-emerald me-2"></i>Team Registration</h5>
+                    <p class="small text-muted mb-3">Registration Period: <br><strong>{{ tournament.registration_start_date|date:"M d" }}</strong> to <strong>{{ tournament.registration_end_date|date:"M d, Y" }}</strong></p>
+                    
+                    {% if user.is_authenticated %}
+                        {% if user_teams %}
+                            <form method="post" action="{% url 'register_team_tournament' tournament.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Select Your Team</label>
+                                    <select name="team_id" class="form-select" required>
+                                        {% for team in user_teams %}
+                                            <option value="{{ team.id }}">{{ team.name }} ({{ team.short_code }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-emerald w-100 rounded-pill py-2">Register Selected Team</button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning small mb-0">
+                                You don't own any team yet. <a href="{% url 'team_create' %}" class="fw-bold text-dark">Create a Team</a> first!
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-dark w-100 rounded-pill">Login to Register Team</a>
+                    {% endif %}
+                </div>
+
+                <!-- Organizer Contact Info -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-user-tie text-warning me-2"></i>Organizer Contact</h5>
+                    <p class="mb-1 fw-bold">{{ tournament.organizer.username }}</p>
+                    <p class="small text-muted mb-1"><i class="fa-solid fa-phone me-2 text-success"></i>{{ tournament.contact_phone }}</p>
+                    <p class="small text-muted mb-0"><i class="fa-solid fa-envelope me-2 text-primary"></i>{{ tournament.contact_email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Fixtures & Scorecards Tab -->
+    <div class="tab-pane fade" id="fixtures">
+        <div class="row g-4">
+            {% for m in matches %}
+                <div class="col-md-6">
+                    <div class="match-card h-100 border shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-navy text-white">{{ m.round_name }}</span>
+                            <span class="badge {% if m.status == 'COMPLETED' %}bg-success{% elif m.status == 'LIVE' %}badge-live{% else %}bg-secondary{% endif %}">
+                                {{ m.get_status_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="match-team-row border-bottom pb-2">
+                            <span class="match-team-name {% if m.winner == m.team_a %}text-emerald{% endif %}"><i class="fa-solid fa-shield text-primary me-2"></i>{{ m.team_a.name }}</span>
+                            <span class="match-score">{{ m.team_a_score|default:"-" }}</span>
+                        </div>
+                        <div class="match-team-row pt-2">
+                            <span class="match-team-name {% if m.winner == m.team_b %}text-emerald{% endif %}"><i class="fa-solid fa-shield text-secondary me-2"></i>{{ m.team_b.name }}</span>
+                            <span class="match-score">{{ m.team_b_score|default:"-" }}</span>
+                        </div>
+
+                        {% if m.win_margin %}
+                            <div class="mt-3 p-2 bg-light rounded text-center small text-success fw-bold">
+                                <i class="fa-solid fa-trophy text-warning me-1"></i> {{ m.win_margin }}
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-3 d-flex justify-content-between align-items-center">
+                            <small class="text-muted"><i class="fa-solid fa-clock me-1"></i>{{ m.match_date }}</small>
+                            <a href="{% url 'match_detail' m.id %}" class="btn btn-sm btn-outline-dark rounded-pill">View Scorecard</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 text-muted">No matches scheduled yet for this tournament.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 3. Registered Teams Tab -->
+    <div class="tab-pane fade" id="teams">
+        <div class="row g-3">
+            {% for reg in registrations %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fa-solid fa-shield-halved fs-1 text-emerald"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0">{{ reg.team.name }}</h6>
+                                <small class="text-muted">Code: {{ reg.team.short_code }} | Captain: {{ reg.team.captain.full_name|default:"TBD" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 text-muted">No teams registered yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 4. Prizes Tab -->
+    <div class="tab-pane fade" id="prizes">
+        <div class="row g-3">
+            {% for p in prizes %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                        <i class="fa-solid fa-award fs-1 text-warning mb-2"></i>
+                        <h5 class="fw-bold text-navy mb-1">{{ p.title }}</h5>
+                        <h4 class="fw-bold text-success mb-2">₹{{ p.amount_value|floatformat:0 }}</h4>
+                        <p class="small text-muted mb-0">{{ p.description|default:"" }}</p>
+                        {% if p.winner_team or p.winner_player %}
+                            <div class="mt-3 p-2 bg-light rounded small fw-bold text-emerald">
+                                Winner: {{ p.winner_team.name|default:p.winner_player.full_name }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5 text-muted">No prize details added yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

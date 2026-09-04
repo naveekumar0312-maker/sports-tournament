@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sports Tournament | Tamil Nadu Cricket Championship{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center text-md-start mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <span class="badge bg-emerald mb-3 px-3 py-2 fs-6 rounded-pill"><i class="fa-solid fa-map-pin me-1"></i> 38 Districts of Tamil Nadu</span>
+            <h1 class="hero-title mb-3">Tamil Nadu's Official <br><span class="text-warning">Cricket Tournament</span> Portal</h1>
+            <p class="hero-subtitle mb-4">Register teams, manage live cricket fixtures, publish ball-by-ball scorecards, award cash prizes, and connect cricket players across all 38 revenue districts of Tamil Nadu.</p>
+            <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
+                <a href="{% url 'tournament_list' %}" class="btn btn-gold btn-lg px-4 shadow">
+                    <i class="fa-solid fa-baseball-bat-ball me-2"></i> Browse Tournaments
+                </a>
+                <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4">
+                    <i class="fa-solid fa-user-plus me-2"></i> Join as Player / Organizer
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center">
+            <div class="p-4 bg-white text-dark rounded-4 shadow-lg text-start border-start border-5 border-emerald">
+                <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-fire text-danger me-2"></i>Live Match Scorecard</h5>
+                {% if live_matches %}
+                    {% for m in live_matches %}
+                        <div class="match-card border bg-light mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge badge-live"><i class="fa-solid fa-circle me-1"></i> LIVE</span>
+                                <small class="text-muted fw-bold">{{ m.tournament.name }}</small>
+                            </div>
+                            <div class="match-team-row">
+                                <span class="match-team-name"><i class="fa-solid fa-shield me-2 text-primary"></i>{{ m.team_a.name }}</span>
+                                <span class="match-score text-success">{{ m.team_a_score|default:"Inning 1" }}</span>
+                            </div>
+                            <div class="match-team-row">
+                                <span class="match-team-name"><i class="fa-solid fa-shield me-2 text-secondary"></i>{{ m.team_b.name }}</span>
+                                <span class="match-score">{{ m.team_b_score|default:"Inning 2" }}</span>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <a href="{% url 'match_detail' m.id %}" class="btn btn-sm btn-dark w-100 rounded-pill">View Live Scorecard</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-3 bg-light rounded text-center">
+                        <i class="fa-solid fa-calendar-check text-muted fs-3 mb-2"></i>
+                        <p class="mb-0 text-muted small fw-bold">No live matches right now. Check upcoming fixtures!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stat Counters -->
+<div class="row g-4 mb-5">
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon stat-icon-emerald me-3"><i class="fa-solid fa-trophy"></i></div>
+            <div>
+                <div class="stat-number">{{ total_tournaments }}</div>
+                <div class="text-muted small fw-semibold">Tournaments</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon stat-icon-gold me-3"><i class="fa-solid fa-people-group"></i></div>
+            <div>
+                <div class="stat-number">{{ total_teams }}</div>
+                <div class="text-muted small fw-semibold">Clubs & Teams</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon stat-icon-navy me-3"><i class="fa-solid fa-user-ninja"></i></div>
+            <div>
+                <div class="stat-number">{{ total_players }}</div>
+                <div class="text-muted small fw-semibold">Players</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card d-flex align-items-center">
+            <div class="stat-icon stat-icon-rose me-3"><i class="fa-solid fa-map-location-dot"></i></div>
+            <div>
+                <div class="stat-number">{{ total_districts }}</div>
+                <div class="text-muted small fw-semibold">TN Districts</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Tournaments -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0 text-navy"><i class="fa-solid fa-star text-warning me-2"></i>Active Tamil Nadu Tournaments</h3>
+        <p class="text-muted small mb-0">Browse ongoing, upcoming, and open registration cricket tournaments in your district.</p>
+    </div>
+    <a href="{% url 'tournament_list' %}" class="btn btn-outline-dark btn-sm rounded-pill fw-bold">View All <i class="fa-solid fa-arrow-right ms-1"></i></a>
+</div>
+
+<div class="row g-4 mb-5">
+    {% for t in featured_tournaments %}
+        <div class="col-md-6 col-lg-4">
+            <div class="tournament-card h-100 d-flex flex-column">
+                <div class="tournament-banner-placeholder">
+                    <i class="fa-solid fa-trophy fs-1 opacity-50"></i>
+                </div>
+                <div class="p-4 d-flex flex-column flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge badge-status 
+                            {% if t.status == 'ONGOING' %}badge-ongoing
+                            {% elif t.status == 'REGISTRATION_OPEN' %}badge-registration-open
+                            {% else %}badge-upcoming{% endif %}">
+                            {{ t.get_status_display }}
+                        </span>
+                        <span class="small text-muted fw-bold"><i class="fa-solid fa-map-marker-alt me-1 text-danger"></i>{{ t.district.name }}</span>
+                    </div>
+
+                    <h5 class="fw-bold mb-2 text-navy">{{ t.name }}</h5>
+                    <p class="text-muted small line-clamp-2 mb-3">{{ t.description|truncatewords:15 }}</p>
+
+                    <div class="bg-light p-2 rounded mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted"><i class="fa-solid fa-indian-rupee-sign me-1"></i>Entry Fee:</span>
+                            <span class="fw-bold text-success">₹{{ t.entry_fee|floatformat:0 }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted"><i class="fa-solid fa-calendar me-1"></i>Dates:</span>
+                            <span class="fw-semibold">{{ t.start_date|date:"M d" }} - {{ t.end_date|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto">
+                        <a href="{% url 'tournament_detail' t.id %}" class="btn btn-emerald w-100 rounded-pill">View Details & Fixtures</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center py-4">No tournaments available right now.</div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Recent Results -->
+<div class="row gy-4 mb-5">
+    <div class="col-lg-6">
+        <h4 class="fw-bold mb-3 text-navy"><i class="fa-solid fa-square-check text-success me-2"></i>Recent Match Results</h4>
+        {% for rm in recent_matches %}
+            <div class="match-card mb-3 border">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-secondary"><i class="fa-solid fa-circle-check me-1"></i> COMPLETED</span>
+                    <small class="text-muted fw-bold">{{ rm.tournament.name }}</small>
+                </div>
+                <div class="match-team-row">
+                    <span class="match-team-name {% if rm.winner == rm.team_a %}text-emerald fw-bold{% endif %}">
+                        <i class="fa-solid fa-shield me-2"></i>{{ rm.team_a.name }}
+                    </span>
+                    <span class="match-score">{{ rm.team_a_score }}</span>
+                </div>
+                <div class="match-team-row">
+                    <span class="match-team-name {% if rm.winner == rm.team_b %}text-emerald fw-bold{% endif %}">
+                        <i class="fa-solid fa-shield me-2"></i>{{ rm.team_b.name }}
+                    </span>
+                    <span class="match-score">{{ rm.team_b_score }}</span>
+                </div>
+                <div class="bg-light p-2 rounded mt-2 text-center small text-success fw-bold">
+                    <i class="fa-solid fa-award me-1 text-warning"></i> {{ rm.win_margin|default:"Result Published" }}
+                </div>
+            </div>
+        {% empty %}
+            <div class="p-4 bg-light rounded text-center text-muted">No completed match results yet.</div>
+        {% endfor %}
+    </div>
+
+    <!-- Tamil Nadu Districts Quick Explorer -->
+    <div class="col-lg-6">
+        <h4 class="fw-bold mb-3 text-navy"><i class="fa-solid fa-map-location-dot text-primary me-2"></i>Tamil Nadu Districts Network</h4>
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <p class="text-muted small">Our application covers all 38 districts of Tamil Nadu, enabling seamless local taluk-level tournament organizing, scouting, and match tracking.</p>
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Chennai</span></div>
+                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Coimbatore</span></div>
+                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Madurai</span></div>
+                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Trichy</span></div>
+                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Salem</span></div>
+                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Tirunelveli</span></div>
+            </div>
+            <a href="{% url 'district_list' %}" class="btn btn-outline-emerald w-100 rounded-pill fw-bold">Explore All 38 Tamil Nadu Districts</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

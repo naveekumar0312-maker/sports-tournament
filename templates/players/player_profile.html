@@ -1,0 +1,465 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile.full_name|default:profile.user.username }} | Player Profile | Sports Tournament{% endblock %}
+
+{% block content %}
+<!-- Profile Header Banner -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <div class="row align-items-center">
+        <div class="col-md-2 text-center mb-3 mb-md-0">
+            {% if profile.profile_photo %}
+                <img src="{{ profile.profile_photo.url }}" class="rounded-circle shadow-sm border border-3 border-purple" style="width: 110px; height: 110px; object-fit: cover;" alt="{{ profile.full_name }}">
+            {% else %}
+                <div class="icon-purple-bg mx-auto rounded-circle d-flex align-items-center justify-content-center text-secondary bg-light border border-2 border-secondary" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <span class="d-block text-muted small mt-1 fw-bold">No Profile Photo</span>
+            {% endif %}
+        </div>
+        <div class="col-md-7 text-center text-md-start">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                <h2 class="fw-bold text-dark mb-0">{{ profile.full_name|default:profile.user.username }}</h2>
+                <span class="badge bg-dark rounded-pill fs-6">Player ID: #{{ profile.id }}</span>
+                {% if profile.jersey_number %}
+                    <span class="badge bg-purple rounded-pill fs-6">Jersey #{{ profile.jersey_number }}</span>
+                {% endif %}
+            </div>
+
+            <p class="text-muted small mb-2">
+                <i class="fa-solid fa-baseball-bat-ball text-purple me-1"></i> {{ profile.get_playing_role_display|default:"Not Provided" }} 
+                {% if profile.district %}
+                    • <i class="fa-solid fa-location-dot text-danger me-1"></i> Tamil Nadu → {{ profile.district.name }}{% if profile.taluk %} → {{ profile.taluk.name }}{% endif %}{% if profile.village %} → {{ profile.village.name }}{% endif %}
+                {% else %}
+                    • <i class="fa-solid fa-location-dot text-secondary me-1"></i> Location: Not Provided
+                {% endif %}
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
+                {% if profile.current_team %}
+                    <a href="{% url 'team_detail' profile.current_team.id %}" class="badge bg-light text-dark border text-decoration-none">
+                        <i class="fa-solid fa-shield-halved text-purple me-1"></i> Team: {{ profile.current_team.name }}
+                    </a>
+                {% else %}
+                    <span class="badge bg-light text-muted border"><i class="fa-solid fa-user-slash me-1"></i> Team: Not Assigned</span>
+                {% endif %}
+
+                <span class="badge bg-light text-dark border">
+                    <i class="fa-solid fa-clock me-1 text-success"></i> Experience: {% if profile.playing_experience_years %}{{ profile.playing_experience_years }} Yrs{% else %}Not Provided{% endif %}
+                </span>
+
+                <span class="badge bg-light text-dark border">
+                    <i class="fa-solid fa-user me-1 text-info"></i> {{ profile.get_gender_display|default:"Not Provided" }}
+                </span>
+            </div>
+        </div>
+        <div class="col-md-3 text-center text-md-end mt-3 mt-md-0">
+            {% if user == profile.user or user.is_admin_role %}
+                <a href="{% url 'edit_player_profile' %}" class="btn btn-purple rounded-pill px-4">
+                    <i class="fa-solid fa-user-pen me-1"></i> Edit Profile
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Exact Personal & Contact Information -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-id-card text-purple me-2"></i>Personal & Contact Details</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted fw-semibold" style="width: 35%;">Player Name:</td>
+                            <td class="fw-bold text-dark">{{ profile.full_name|default:profile.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Account Username:</td>
+                            <td class="text-dark">{{ profile.user.username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Email Address:</td>
+                            <td class="text-dark">{{ profile.user.email|default:"Not Provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Mobile Number:</td>
+                            <td class="text-dark">{{ profile.mobile_number|default:profile.user.phone_number|default:"Not Provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Date of Birth:</td>
+                            <td class="text-dark">
+                                {% if profile.date_of_birth %}
+                                    {{ profile.date_of_birth|date:"d M Y" }}
+                                {% else %}
+                                    Not Provided
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Age:</td>
+                            <td class="text-dark">
+                                {% if profile.age %}
+                                    {{ profile.age }} Years
+                                {% else %}
+                                    Not Provided
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Gender:</td>
+                            <td class="text-dark">{{ profile.get_gender_display|default:"Not Provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">District:</td>
+                            <td class="text-dark">{{ profile.district.name|default:"Not Provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Taluk / Sub-District:</td>
+                            <td class="text-dark">{{ profile.taluk.name|default:"Not Provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Village:</td>
+                            <td class="text-dark">{{ profile.village.name|default:"Not Provided" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exact Team & Tournament Associations -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i>Team & Tournament Status</h5>
+            
+            <div class="mb-4 p-3 bg-light rounded-3">
+                <span class="text-muted small fw-bold d-block mb-1">Assigned Team:</span>
+                {% if profile.current_team %}
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">
+                                <a href="{% url 'team_detail' profile.current_team.id %}" class="text-decoration-none text-purple">
+                                    {{ profile.current_team.name }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">District: {{ profile.current_team.district.name }}</small>
+                        </div>
+                        <span class="badge bg-dark">{{ profile.current_team.short_code }}</span>
+                    </div>
+                {% else %}
+                    <span class="text-muted fw-bold">Not Assigned</span>
+                {% endif %}
+            </div>
+
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted small fw-bold d-block mb-2">Participating Tournaments:</span>
+                {% if tournaments %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for t in tournaments %}
+                            <a href="{% url 'tournament_detail' t.id %}" class="btn btn-sm btn-outline-purple rounded-pill">
+                                <i class="fa-solid fa-trophy text-warning me-1"></i> {{ t.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <span class="text-muted fw-bold">No Tournament Assigned</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Basic & Cricket Attributes -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-sliders text-purple me-2"></i>Cricket Specifications & Attributes</h5>
+    <div class="row g-3 small">
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Playing Role</span>
+                <strong class="text-dark">{{ profile.get_playing_role_display|default:"Not Provided" }}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Batting Style</span>
+                <strong class="text-dark">{{ profile.get_batting_style_display|default:"Not Provided" }}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Batting Position</span>
+                <strong class="text-dark">{{ profile.get_batting_position_display|default:"Not Provided" }}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Bowling Style</span>
+                <strong class="text-dark">{{ profile.get_bowling_style_display|default:"Not Provided" }}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Bowling Type</span>
+                <strong class="text-dark">{{ profile.get_bowling_type_display|default:"Not Provided" }}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Jersey Number</span>
+                <strong class="text-dark">{% if profile.jersey_number %}#{{ profile.jersey_number }}{% else %}Not Provided{% endif %}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Preferred Position</span>
+                <strong class="text-dark">{{ profile.preferred_position|default:"Not Provided" }}</strong>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3">
+                <span class="text-muted d-block">Player Status</span>
+                <strong class="text-dark">{{ profile.get_player_status_display|default:"Available" }}</strong>
+            </div>
+        </div>
+    </div>
+    {% if profile.bio %}
+        <div class="mt-3 p-3 bg-light rounded-3 small">
+            <span class="text-muted fw-bold d-block mb-1">Player Bio:</span>
+            <p class="mb-0 text-dark">{{ profile.bio }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Batting Statistics Section -->
+<div class="mb-4">
+    <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-baseball-bat-ball text-purple me-2"></i>Career Batting Statistics</h4>
+    <div class="row g-3">
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.matches }}</div>
+                <div class="cricket-stat-label">Matches</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.innings }}</div>
+                <div class="cricket-stat-label">Innings</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-purple">{{ batting_stats.runs }}</div>
+                <div class="cricket-stat-label">Runs</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.highest_score }}</div>
+                <div class="cricket-stat-label">Highest Score</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-success">{{ batting_stats.average }}</div>
+                <div class="cricket-stat-label">Average</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-info">{{ batting_stats.strike_rate }}</div>
+                <div class="cricket-stat-label">Strike Rate</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.fifties }}</div>
+                <div class="cricket-stat-label">50s</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-warning">{{ batting_stats.hundreds }}</div>
+                <div class="cricket-stat-label">100s</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.fours }}</div>
+                <div class="cricket-stat-label">Fours (4s)</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-danger">{{ batting_stats.sixes }}</div>
+                <div class="cricket-stat-label">Sixes (6s)</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.not_outs }}</div>
+                <div class="cricket-stat-label">Not Outs</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ batting_stats.ducks }}</div>
+                <div class="cricket-stat-label">Ducks</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bowling Statistics Section -->
+<div class="mb-4">
+    <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-bowling-ball text-purple me-2"></i>Career Bowling Statistics</h4>
+    <div class="row g-3">
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-purple">{{ bowling_stats.wickets }}</div>
+                <div class="cricket-stat-label">Wickets</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ bowling_stats.best_bowling }}</div>
+                <div class="cricket-stat-label">Best Bowling</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-success">{{ bowling_stats.economy }}</div>
+                <div class="cricket-stat-label">Economy Rate</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ bowling_stats.average }}</div>
+                <div class="cricket-stat-label">Bowling Avg</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ bowling_stats.overs }}</div>
+                <div class="cricket-stat-label">Overs</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ bowling_stats.runs_conceded }}</div>
+                <div class="cricket-stat-label">Runs Conceded</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ bowling_stats.four_wickets }}</div>
+                <div class="cricket-stat-label">4 Wickets</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-warning">{{ bowling_stats.five_wickets }}</div>
+                <div class="cricket-stat-label">5 Wickets</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ bowling_stats.maidens }}</div>
+                <div class="cricket-stat-label">Maidens</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fielding Statistics Section -->
+<div class="mb-4">
+    <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-hand-holding-hand text-purple me-2"></i>Fielding Statistics</h4>
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ fielding_stats.catches }}</div>
+                <div class="cricket-stat-label">Catches</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ fielding_stats.run_outs }}</div>
+                <div class="cricket-stat-label">Run Outs</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value">{{ fielding_stats.stumpings }}</div>
+                <div class="cricket-stat-label">Stumpings</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cricket-stat-box">
+                <div class="cricket-stat-value text-purple">{{ fielding_stats.total_dismissals }}</div>
+                <div class="cricket-stat-label">Total Dismissals</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Match-by-Match Recent Performance Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+    <div class="card-header bg-white p-3 border-bottom">
+        <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-list-check text-purple me-2"></i>Recent Match Performances</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center small">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-start fw-bold" style="color: #111827;">Tournament</th>
+                    <th class="fw-bold" style="color: #111827;">Date</th>
+                    <th class="fw-bold" style="color: #111827;">Opponent</th>
+                    <th class="fw-bold" style="color: #111827;">Runs (Balls)</th>
+                    <th class="fw-bold" style="color: #111827;">4s / 6s</th>
+                    <th class="fw-bold" style="color: #111827;">Bat SR</th>
+                    <th class="fw-bold" style="color: #111827;">Wkts / Overs</th>
+                    <th class="fw-bold" style="color: #111827;">Econ</th>
+                    <th class="fw-bold" style="color: #111827;">Catches</th>
+                    <th class="fw-bold" style="color: #111827;">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for perf in recent_performances %}
+                    <tr>
+                        <td class="text-start fw-bold" style="color: #111827;">{{ perf.match.tournament.name }}</td>
+                        <td style="color: #374151;">{{ perf.match.match_date|date:"d M Y" }}</td>
+                        <td style="color: #374151;">
+                            {% if perf.team == perf.match.team_a %}
+                                {{ perf.match.team_b.name }}
+                            {% else %}
+                                {{ perf.match.team_a.name }}
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold text-purple">{{ perf.runs }} ({{ perf.balls_faced }})</td>
+                        <td style="color: #374151;">{{ perf.fours }} / {{ perf.sixes }}</td>
+                        <td style="color: #374151;">{{ perf.strike_rate }}</td>
+                        <td style="color: #374151;">{{ perf.wickets }} / {{ perf.overs_bowled }}</td>
+                        <td style="color: #374151;">{{ perf.economy_rate }}</td>
+                        <td style="color: #374151;">{{ perf.catches }}</td>
+                        <td>
+                            {% if perf.match.winner == perf.team %}
+                                <span class="badge bg-success text-white">Won</span>
+                            {% elif perf.match.winner %}
+                                <span class="badge bg-danger text-white">Lost</span>
+                            {% else %}
+                                <span class="badge bg-secondary text-white">Draw</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-center py-4" style="color: #6B7280;">
+                            No match performances recorded yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

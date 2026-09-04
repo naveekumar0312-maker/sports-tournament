@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Enter Scores | {{ match.team_a.short_code }} vs {{ match.team_b.short_code }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-9 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="bg-purple p-4 text-white">
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-pen-to-square me-2"></i>Match Scorecard & Result Entry</h3>
+                <p class="small text-slate-200 mb-0">{{ match.team_a.name }} vs {{ match.team_b.name }} ({{ match.tournament.name }})</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Match Status</label>
+                        {{ form.status }}
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-coin text-warning me-2"></i>Toss Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Toss Winner</label>
+                            {{ form.toss_winner }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Toss Decision</label>
+                            {{ form.toss_decision }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-ol text-purple me-2"></i>Team Scores & Overs</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">{{ match.team_a.name }} Score</label>
+                            {{ form.team_a_score }}
+                            <small class="text-muted">e.g. 185/4 (20.0 ov)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">{{ match.team_b.name }} Score</label>
+                            {{ form.team_b_score }}
+                            <small class="text-muted">e.g. 170/8 (20.0 ov)</small>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i>Result & Award</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Match Winner</label>
+                            {{ form.winner }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Win Margin</label>
+                            {{ form.win_margin }}
+                            <small class="text-muted">e.g. Won by 15 runs / 4 wickets</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Man of the Match</label>
+                            {{ form.man_of_the_match }}
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-4 border d-flex align-items-center">
+                        <div class="form-check me-3">
+                            {{ form.is_result_published }}
+                            <label class="form-check-label fw-bold text-dark ms-2" for="id_is_result_published">
+                                Publish Result & Send Notifications
+                            </label>
+                        </div>
+                        <small class="text-muted">Checking this box will automatically notify all registered players and teams!</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-purple w-100 py-3 rounded-pill shadow">
+                        <i class="fa-solid fa-check-circle me-2"></i> Save Match Score & Result
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recorded Player Match Performances Table -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center border-bottom">
+                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-users text-purple me-2"></i>Individual Player Performances</h5>
+                <a href="{% url 'add_player_performance' match.id %}" class="btn btn-sm btn-purple rounded-pill">
+                    <i class="fa-solid fa-plus me-1"></i> Add Player Performance
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center small">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-start">Player Name</th>
+                            <th>Team</th>
+                            <th>Runs (Balls)</th>
+                            <th>Wkts / Overs</th>
+                            <th>Catches</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in performances %}
+                            <tr>
+                                <td class="text-start fw-bold text-dark">{{ p.player.full_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ p.team.short_code }}</span></td>
+                                <td class="fw-bold text-purple">{{ p.runs }} ({{ p.balls_faced }})</td>
+                                <td>{{ p.wickets }} / {{ p.overs_bowled }}</td>
+                                <td>{{ p.catches }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No individual player performances added yet. Click <strong>Add Player Performance</strong> to enter player runs and wickets!
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

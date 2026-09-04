@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ team.name }} | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+    <div class="p-4 p-md-5 text-dark border-bottom">
+        <div class="d-flex align-items-center">
+            <i class="fa-solid fa-shield-halved fs-1 text-warning me-3"></i>
+            <div>
+                <span class="badge bg-emerald mb-1">{{ team.short_code }}</span>
+                <h2 class="fw-bold mb-1" style="color: #111827;">{{ team.name }}</h2>
+                <p class="small mb-0" style="color: #374151;"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ team.district.name }} District</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Team Roster -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-users text-warning me-2"></i>Playing Squad Roster</h5>
+                <span class="badge bg-emerald">{{ members.count }} Players</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="color: #111827;" class="fw-bold">Player Name</th>
+                                <th style="color: #111827;" class="fw-bold">Playing Role</th>
+                                <th style="color: #111827;" class="fw-bold">Batting</th>
+                                <th style="color: #111827;" class="fw-bold">Bowling</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in members %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'player_profile_detail' player.id %}" class="fw-bold text-decoration-none" style="color: #111827;">
+                                            {{ player.full_name }}
+                                        </a>
+                                        {% if player == team.captain %}<span class="badge bg-warning text-dark ms-1">C</span>{% endif %}
+                                        {% if player == team.vice_captain %}<span class="badge bg-secondary text-white ms-1">VC</span>{% endif %}
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ player.get_playing_role_display }}</span></td>
+                                    <td class="small" style="color: #374151;">{{ player.get_batting_style_display }}</td>
+                                    <td class="small" style="color: #374151;">{{ player.get_bowling_style_display }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="text-center py-4" style="color: #6B7280;">No player members added yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Player to Team Modal / Form for Team Creator -->
+        {% if user == team.created_by or user.is_admin_role %}
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <h5 class="fw-bold mb-3" style="color: #111827;"><i class="fa-solid fa-user-plus text-emerald me-2"></i>Recruit / Add Player to Team</h5>
+                <form method="post" action="{% url 'add_player_to_team' team.id %}">
+                    {% csrf_token %}
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-8">
+                            <select name="player_id" class="form-select bg-white" required style="color: #111827;">
+                                <option value="" style="color: #111827;">-- Select Available Player --</option>
+                                {% for p in available_players %}
+                                    <option value="{{ p.id }}" style="color: #111827;">{{ p.full_name }} ({{ p.get_playing_role_display }} - {{ p.district.name|default:"TN" }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-emerald w-100 rounded-pill">Add to Roster</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Team Tournament Registrations -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <h5 class="fw-bold mb-3" style="color: #111827;"><i class="fa-solid fa-trophy text-warning me-2"></i>Tournament History</h5>
+            <ul class="list-group list-group-flush">
+                {% for reg in registrations %}
+                    <li class="list-group-item px-0 py-2 border-bottom bg-white">
+                        <a href="{% url 'tournament_detail' reg.tournament.id %}" class="fw-bold text-decoration-none d-block" style="color: #111827;">
+                            {{ reg.tournament.name }}
+                        </a>
+                        <small style="color: #374151;"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ reg.tournament.district.name }}</small>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item px-0 py-3 bg-white" style="color: #6B7280;">Not registered in any tournaments yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

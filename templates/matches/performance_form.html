@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Player Performance | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-9">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="bg-purple p-4 text-white">
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-user-pen text-warning me-2"></i>Record Individual Player Match Performance</h3>
+                <p class="small text-slate-200 mb-0">{{ match.team_a.name }} vs {{ match.team_b.name }} ({{ match.tournament.name }})</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Select Player *</label>
+                            {{ form.player }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Select Team *</label>
+                            {{ form.team }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-baseball-bat-ball text-purple me-2"></i>Batting Performance</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Dismissal Status</label>
+                            {{ form.batting_status }}
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Runs Scored</label>
+                            {{ form.runs }}
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Balls Faced</label>
+                            {{ form.balls_faced }}
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Fours (4s)</label>
+                            {{ form.fours }}
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Sixes (6s)</label>
+                            {{ form.sixes }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-bowling-ball text-purple me-2"></i>Bowling Performance</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Overs Bowled</label>
+                            {{ form.overs_bowled }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Runs Conceded</label>
+                            {{ form.runs_conceded }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Wickets Taken</label>
+                            {{ form.wickets }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Maidens</label>
+                            {{ form.maidens }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-hand-holding-hand text-purple me-2"></i>Fielding Performance</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Catches</label>
+                            {{ form.catches }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Run Outs</label>
+                            {{ form.run_outs }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Stumpings</label>
+                            {{ form.stumpings }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-purple w-100 py-3 rounded-pill shadow">
+                        <i class="fa-solid fa-check-circle me-2"></i> Save Performance & Update Player Statistics
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

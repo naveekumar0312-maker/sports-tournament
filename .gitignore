@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.log
+
+.venv/
+venv/
+env/
+
+.env
+
+staticfiles/
+
+# Keep SQLite database
+# db.sqlite3

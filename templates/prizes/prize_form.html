@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Prize | {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="bg-navy p-4 text-white">
+                <h3 class="fw-bold mb-1"><i class="fa-solid fa-award text-warning me-2"></i>Add Tournament Prize</h3>
+                <p class="small text-slate-300 mb-0">Configure prize amounts and award winners for {{ tournament.name }}.</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Prize Category *</label>
+                        {{ form.category }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Custom Award Title (If Custom selected)</label>
+                        {{ form.title_custom }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Prize Amount (₹) *</label>
+                        {{ form.amount_value }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Description / Gift items</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Winner Team (Optional)</label>
+                            {{ form.winner_team }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Winner Player (Optional)</label>
+                            {{ form.winner_player }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-emerald w-100 py-3 rounded-pill shadow">
+                        <i class="fa-solid fa-check-circle me-2"></i> Add Prize Details
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

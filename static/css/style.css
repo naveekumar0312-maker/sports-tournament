@@ -1,0 +1,347 @@
+/* Tamil Nadu Sports Tournament - Light Purple Theme & Sidebar System */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary-purple: #6D4AFF;
+    --primary-purple-hover: #5b3be0;
+    --dark-purple: #4C35B8;
+    --light-purple: #F1EDFF;
+    --bg-page: #F8F9FC;
+    --card-bg: #FFFFFF;
+    --card-border: #E5E7EB;
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --sidebar-width: 260px;
+}
+
+body {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Sidebar Styling */
+.app-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.app-sidebar {
+    width: var(--sidebar-width);
+    background-color: #ffffff;
+    border-right: 1px solid var(--card-border);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1030;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar-brand {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--dark-purple);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-brand i {
+    color: var(--primary-purple);
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.sidebar-item {
+    margin-bottom: 0.35rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-link i {
+    font-size: 1.1rem;
+    width: 24px;
+    margin-right: 0.75rem;
+    color: #9CA3AF;
+    transition: color 0.2s ease;
+}
+
+.sidebar-link:hover {
+    color: var(--primary-purple);
+    background-color: var(--light-purple);
+}
+
+.sidebar-link:hover i {
+    color: var(--primary-purple);
+}
+
+.sidebar-link.active {
+    color: var(--primary-purple);
+    background-color: var(--light-purple);
+    font-weight: 700;
+}
+
+.sidebar-link.active i {
+    color: var(--primary-purple);
+}
+
+.sidebar-section-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #9CA3AF;
+    margin: 1.25rem 0 0.5rem 0.75rem;
+}
+
+.sidebar-user {
+    padding: 1rem 0.75rem;
+    border-top: 1px solid var(--card-border);
+    margin-top: auto;
+}
+
+/* Main Content Area Offset */
+.app-content {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+    }
+    .app-content {
+        margin-left: 0;
+    }
+    .offcanvas-sidebar {
+        width: 280px !important;
+    }
+}
+
+/* Top Bar for Mobile */
+.mobile-topbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--card-border);
+    padding: 0.85rem 1.25rem;
+}
+
+/* Stat Cards Light Purple Theme */
+.stat-card-purple {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    padding: 1.35rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease;
+}
+
+.stat-card-purple:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-purple);
+}
+
+.icon-purple-bg {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background-color: var(--light-purple);
+    color: var(--primary-purple);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+/* Custom Purple Buttons */
+.btn-purple {
+    background-color: var(--primary-purple);
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 0.65rem 1.25rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-purple:hover {
+    background-color: var(--primary-purple-hover);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(109, 74, 255, 0.3);
+}
+
+.btn-outline-purple {
+    border: 1.5px solid var(--primary-purple);
+    color: var(--primary-purple);
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.6rem 1.25rem;
+    background-color: transparent;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-purple:hover {
+    background-color: var(--primary-purple);
+    color: #ffffff;
+}
+
+/* Badges */
+.badge-purple {
+    background-color: var(--light-purple);
+    color: var(--primary-purple);
+    font-weight: 700;
+    padding: 0.4em 0.8em;
+    border-radius: 20px;
+}
+
+/* Scorecard & Profile Stat Cards */
+.cricket-stat-box {
+    background-color: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.cricket-stat-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--dark-purple);
+}
+
+.cricket-stat-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+/* Footer Styling */
+footer {
+    margin-top: auto;
+    background-color: #ffffff;
+    border-top: 1px solid var(--card-border);
+    color: #4B5563;
+    padding: 2.5rem 0 1.5rem 0;
+}
+
+footer a {
+    color: #111827;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+footer a:hover {
+    color: var(--primary-purple);
+}
+
+/* Contrast & Theme Utilities */
+.text-dark-main {
+    color: #111827 !important;
+}
+.text-body-custom {
+    color: #374151 !important;
+}
+.text-secondary-custom {
+    color: #6B7280 !important;
+}
+.text-purple {
+    color: var(--primary-purple) !important;
+}
+.bg-purple {
+    background-color: var(--primary-purple) !important;
+    color: #ffffff !important;
+}
+.bg-light-purple {
+    background-color: var(--light-purple) !important;
+}
+.text-emerald {
+    color: #059669 !important;
+}
+.bg-emerald {
+    background-color: #10B981 !important;
+    color: #ffffff !important;
+}
+.btn-emerald {
+    background-color: #10B981 !important;
+    color: #ffffff !important;
+    border: none;
+    font-weight: 600;
+}
+.btn-emerald:hover {
+    background-color: #059669 !important;
+    color: #ffffff !important;
+}
+.border-emerald {
+    border-color: #10B981 !important;
+}
+.bg-navy {
+    background-color: #ffffff !important;
+}
+.text-navy {
+    color: #111827 !important;
+}
+
+/* Strict Text Contrast Rules for White / Light Backgrounds */
+table thead th {
+    color: #111827 !important;
+    font-weight: 700;
+}
+
+table tbody td {
+    color: #111827;
+}
+
+.table-hover tbody tr:hover td {
+    color: #111827;
+}
+
+.form-select, .form-control {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+}
+
+.form-select option {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+}
+
+.card-header {
+    color: #111827 !important;
+}
+
+label, .form-label {
+    color: #374151 !important;
+}
+
+

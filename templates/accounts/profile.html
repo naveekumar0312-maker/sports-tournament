@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-navy text-white p-4 rounded-top-4">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fa-solid fa-circle-user fs-1 text-warning"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-0">{{ user.username }}</h4>
+                        <span class="badge bg-emerald">{{ user.get_role_display }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Bio</label>
+                            {{ form.bio }}
+                        </div>
+                    </div>
+
+                    {% if player_profile %}
+                        <div class="p-3 bg-light rounded-3 mb-4 border">
+                            <h6 class="fw-bold text-navy mb-2"><i class="fa-solid fa-baseball-bat-ball text-warning me-2"></i>Cricket Profile Stats:</h6>
+                            <div class="row g-2 small">
+                                <div class="col-6"><strong>Role:</strong> {{ player_profile.get_playing_role_display }}</div>
+                                <div class="col-6"><strong>Batting:</strong> {{ player_profile.get_batting_style_display }}</div>
+                                <div class="col-6"><strong>Bowling:</strong> {{ player_profile.get_bowling_style_display }}</div>
+                                <div class="col-6"><strong>Team:</strong> {{ player_profile.current_team.name|default:"Free Agent / No Team" }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-emerald w-100 py-2.5 rounded-pill shadow-sm">
+                        <i class="fa-solid fa-save me-2"></i> Save Profile Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

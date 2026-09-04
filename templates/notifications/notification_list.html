@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-navy mb-0"><i class="fa-solid fa-bell text-warning me-2"></i>My Notification Center</h2>
+                <p class="text-muted small mb-0">Stay updated with team registrations, fixtures, live scorecards, and prize announcements.</p>
+            </div>
+            {% if unread_count > 0 %}
+                <a href="{% url 'mark_all_notifications_read' %}" class="btn btn-outline-dark rounded-pill px-3 btn-sm">
+                    <i class="fa-solid fa-check-double me-1"></i> Mark All as Read
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="list-group list-group-flush">
+                {% for n in notifications %}
+                    <div class="list-group-item p-4 {% if not n.is_read %}bg-light border-start border-4 border-emerald{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div>
+                                <span class="badge 
+                                    {% if n.notification_type == 'MATCH_RESULT' %}bg-success
+                                    {% elif n.notification_type == 'FIXTURE_ANNOUNCEMENT' %}bg-primary
+                                    {% elif n.notification_type == 'PRIZE_ANNOUNCEMENT' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %} me-2">
+                                    {{ n.get_notification_type_display }}
+                                </span>
+                                <strong class="text-navy fs-6">{{ n.title }}</strong>
+                            </div>
+                            <small class="text-muted"><i class="fa-solid fa-clock me-1"></i>{{ n.created_at|timesince }} ago</small>
+                        </div>
+                        <p class="text-muted small mb-2">{{ n.message }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            {% if n.related_link %}
+                                <a href="{% url 'mark_notification_read' n.id %}" class="btn btn-sm btn-emerald rounded-pill px-3">
+                                    View Details <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            {% else %}
+                                {% if not n.is_read %}
+                                    <a href="{% url 'mark_notification_read' n.id %}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                                        Mark Read
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="p-5 text-center text-muted">
+                        <i class="fa-solid fa-bell-slash fs-1 mb-2 text-secondary"></i>
+                        <p class="fw-bold mb-0">No notifications found.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

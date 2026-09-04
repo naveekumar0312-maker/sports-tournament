@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Player Dashboard | Sports Tournament{% endblock %}
+
+{% block content %}
+<!-- Welcome & Player Profile Header -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white border">
+    <div class="row align-items-center">
+        <div class="col-md-2 text-center mb-3 mb-md-0">
+            <i class="fa-solid fa-user-ninja fs-1 text-purple p-3 bg-light-purple rounded-circle"></i>
+        </div>
+        <div class="col-md-7">
+            <h3 class="fw-bold mb-1" style="color: #111827;">{{ player_profile.full_name|default:user.username }}</h3>
+            <p class="small mb-2" style="color: #374151;">
+                <i class="fa-solid fa-baseball-bat-ball text-warning me-1"></i> {{ player_profile.get_playing_role_display|default:"Player Profile" }} 
+                {% if player_profile.district %}
+                    • <i class="fa-solid fa-location-dot text-danger me-1"></i> Tamil Nadu → {{ player_profile.district.name }}{% if player_profile.taluk %} → {{ player_profile.taluk.name }}{% endif %}{% if player_profile.village %} → {{ player_profile.village.name }}{% endif %}
+                {% else %}
+                    • <i class="fa-solid fa-location-dot text-secondary me-1"></i> Location: Not Provided
+                {% endif %}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                {% if player_profile.batting_style %}
+                    <span class="badge bg-purple"><i class="fa-solid fa-hand-holding-hand me-1"></i> {{ player_profile.get_batting_style_display }}</span>
+                {% endif %}
+                {% if player_profile.bowling_style %}
+                    <span class="badge bg-secondary"><i class="fa-solid fa-bowling-ball me-1"></i> {{ player_profile.get_bowling_style_display }}</span>
+                {% endif %}
+            </div>
+
+        </div>
+        <div class="col-md-3 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'edit_player_profile' %}" class="btn btn-outline-purple rounded-pill px-3">
+                <i class="fa-solid fa-user-pen me-1"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- My Team & Rosters -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-shield-halved text-warning me-2"></i>My Team</h5>
+                <a href="{% url 'team_create' %}" class="btn btn-sm btn-emerald rounded-pill">+ Create Team</a>
+            </div>
+            <div class="card-body p-4">
+                {% if my_teams %}
+                    {% for team in my_teams %}
+                        <div class="p-3 border rounded-3 mb-3 bg-light">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-shield me-2 text-emerald"></i>{{ team.name }}</h5>
+                                <span class="badge bg-dark">{{ team.short_code }}</span>
+                            </div>
+                            <p class="small mb-2" style="color: #374151;">
+                                Captain: <strong style="color: #111827;">{{ team.captain.full_name|default:"TBD" }}</strong> | District: {{ team.district.name }}
+                            </p>
+                            <a href="{% url 'team_detail' team.id %}" class="btn btn-outline-dark btn-sm rounded-pill w-100">
+                                <i class="fa-solid fa-users me-1"></i> View Team Roster & Matches
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fa-solid fa-users-slash fs-2 mb-2 text-secondary"></i>
+                        <p class="mb-2 fw-bold" style="color: #111827;">You are currently not assigned to any team.</p>
+                        <p class="small mb-3" style="color: #374151;">Join an existing team or create your own team to register for Tamil Nadu tournaments!</p>
+                        <a href="{% url 'team_create' %}" class="btn btn-emerald rounded-pill px-4">Create Cricket Team</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- My Upcoming Matches -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-bottom p-3">
+                <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-calendar-days text-emerald me-2"></i>Upcoming Matches</h5>
+            </div>
+            <div class="card-body p-4">
+                {% for m in upcoming_matches %}
+                    <div class="p-3 border rounded-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-primary">{{ m.round_name }}</span>
+                            <small style="color: #6B7280;"><i class="fa-solid fa-calendar me-1"></i>{{ m.match_date }}</small>
+                        </div>
+                        <div class="fw-bold text-center my-2 fs-5" style="color: #111827;">
+                            {{ m.team_a.name }} <span class="text-danger">vs</span> {{ m.team_b.name }}
+                        </div>
+                        <div class="small text-center" style="color: #374151;">
+                            <i class="fa-solid fa-map-marker-alt text-danger me-1"></i>{{ m.venue|default:m.tournament.venue }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center py-4" style="color: #374151;">No upcoming matches scheduled for your team.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications Center Widget -->
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-bell text-warning me-2"></i>Recent Notifications</h5>
+        <a href="{% url 'notification_list' %}" class="btn btn-sm btn-outline-purple rounded-pill">View All</a>
+    </div>
+    <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+            {% for n in my_notifications %}
+                <li class="list-group-item p-3 {% if not n.is_read %}bg-light border-start border-4 border-emerald{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong style="color: #111827;">{{ n.title }}</strong>
+                        <small style="color: #6B7280;">{{ n.created_at|timesince }} ago</small>
+                    </div>
+                    <p class="small mb-0 mt-1" style="color: #374151;">{{ n.message }}</p>
+                </li>
+            {% empty %}
+                <li class="list-group-item p-4 text-center" style="color: #374151;">No notifications yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

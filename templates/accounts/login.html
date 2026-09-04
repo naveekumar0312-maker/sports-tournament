@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Sports Tournament{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="bg-navy p-4 text-center text-white">
+                <i class="fa-solid fa-trophy text-warning fs-1 mb-2"></i>
+                <h3 class="fw-bold mb-1">Welcome Back</h3>
+                <p class="small text-slate-300 mb-0">Login to Sports Tournament Tamil Nadu</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Error Message Alert directly above login form -->
+                {% if error_message %}
+                    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        <strong>{{ error_message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label fw-bold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" name="username" class="form-control" placeholder="Enter username" value="{{ username_val|default:'' }}" id="id_username">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label fw-bold">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="Enter password" id="id_password">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-emerald w-100 py-2.5 rounded-pill shadow-sm mb-3">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Account
+                    </button>
+                </form>
+
+                <!-- Demo Credentials Helper -->
+                <div class="mt-4 p-3 bg-light rounded-3 border">
+                    <h6 class="fw-bold text-dark mb-2 small"><i class="fa-solid fa-key text-warning me-1"></i> Quick Demo Logins:</h6>
+                    <ul class="list-unstyled small mb-0 text-muted">
+                        <li><strong>Organizer:</strong> <code>organizer_chennai</code> / <code>password123</code></li>
+                        <li><strong>Player:</strong> <code>player_vijay</code> / <code>password123</code></li>
+                        <li><strong>Admin:</strong> <code>admin</code> / <code>admin123</code> (at <code>/admin/</code>)</li>
+                    </ul>
+                </div>
+
+                <div class="text-center mt-3 small">
+                    <span class="text-muted">Don't have an account yet?</span>
+                    <a href="{% url 'register' %}" class="fw-bold text-emerald ms-1">Register Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
