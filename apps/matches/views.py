@@ -232,6 +232,13 @@ def live_ball_record_view(request, pk):
         runs_added = 0
         is_legal_delivery = True
 
+        if action == 'SWAP_STRIKE':
+            if match.striker and match.non_striker:
+                match.striker, match.non_striker = match.non_striker, match.striker
+                match.save()
+                messages.success(request, f"Strike rotated! {match.striker.full_name} is now on strike.")
+            return redirect('match_update_score', pk=pk)
+
         if action in ['0', '1', '2', '3', '4', '6']:
             runs = int(action)
             runs_added = runs
@@ -246,7 +253,6 @@ def live_ball_record_view(request, pk):
 
             if bowler_perf:
                 bowler_perf.runs_conceded += runs
-                # overs_bowled representation: .1, .2, .3, .4, .5, .6 -> next over
                 current_ov = float(bowler_perf.overs_bowled)
                 overs_int = int(current_ov)
                 balls_in_ov = round((current_ov - overs_int) * 10) + 1
@@ -256,9 +262,16 @@ def live_ball_record_view(request, pk):
                     bowler_perf.overs_bowled = float(overs_int + (balls_in_ov / 10.0))
                 bowler_perf.save()
 
-            # Swap strike if 1 or 3 runs
+            # Swap strike if 1 or 3 runs (ONLY if over is not completing on this ball)
+            # If over is completing on 6th ball, the over completion block handles the strike rotation
+            current_tot_ov = float(match.current_overs)
+            tot_int = int(current_tot_ov)
+            tot_balls = round((current_tot_ov - tot_int) * 10) + 1
+            is_sixth_ball = (tot_balls >= 6)
+
             if runs in [1, 3] and match.striker and match.non_striker:
-                match.striker, match.non_striker = match.non_striker, match.striker
+                if not is_sixth_ball:
+                    match.striker, match.non_striker = match.non_striker, match.striker
 
         elif action == 'W':
             # Wicket
