@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sports Tournament | Tamil Nadu Cricket{% endblock %}</title>
+    <title>{% block title %}Naveen Cricket Tournament Organization{% endblock %}</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome 6 Icons -->
@@ -16,21 +16,15 @@
 <body>
 
     <div class="app-wrapper">
-        <!-- Desktop Left Sidebar -->
-        <aside class="app-sidebar d-none d-lg-flex">
-            <a href="{% url 'home' %}" class="sidebar-brand">
-                <i class="fa-solid fa-trophy text-warning"></i>
-                <span class="fw-bold">Naveen<span class="text-warning fw-semibold"> Cricket Org</span></span>
-            </a>
+        <!-- Desktop Left Sidebar (Only visible when logged in and NOT on login/register pages) -->
+        {% if user.is_authenticated and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+            <aside class="app-sidebar d-none d-lg-flex">
+                <a href="{% url 'home' %}" class="sidebar-brand">
+                    <i class="fa-solid fa-trophy text-warning"></i>
+                    <span class="fw-bold">Naveen<span class="text-warning fw-semibold"> Cricket Org</span></span>
+                </a>
 
-            <ul class="sidebar-menu">
-                <li class="sidebar-item">
-                    <a href="{% url 'home' %}" class="sidebar-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-                        <i class="fa-solid fa-house"></i> Home
-                    </a>
-                </li>
-
-                {% if user.is_authenticated %}
+                <ul class="sidebar-menu">
                     {% if user.is_admin_role %}
                         <div class="sidebar-section-title">Super Admin Workspace</div>
                         <li class="sidebar-item">
@@ -41,6 +35,11 @@
                         <li class="sidebar-item">
                             <a href="{% url 'tournament_list' %}" class="sidebar-link {% if 'tournaments' in request.path %}active{% endif %}">
                                 <i class="fa-solid fa-trophy text-warning"></i> Tournaments & Fixtures
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'tournament_create' %}" class="sidebar-link {% if 'tournaments/create' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-plus-circle text-success"></i> Create Tournament
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -88,13 +87,13 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'edit_player_profile' %}" class="sidebar-link {% if 'edit-profile' in request.path %}active{% endif %}">
-                                <i class="fa-solid fa-id-card"></i> My Profile & Stats
+                            <a href="{% url 'tournament_list' %}" class="sidebar-link {% if 'tournaments' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-trophy"></i> Tournaments
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a href="{% url 'tournament_list' %}" class="sidebar-link {% if 'tournaments' in request.path %}active{% endif %}">
-                                <i class="fa-solid fa-trophy"></i> Tournaments
+                            <a href="{% url 'edit_player_profile' %}" class="sidebar-link {% if 'edit-profile' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-id-card"></i> My Profile & Stats
                             </a>
                         </li>
                     {% endif %}
@@ -108,29 +107,10 @@
                             {% endif %}
                         </a>
                     </li>
-                {% else %}
-                    <div class="sidebar-section-title">Explore</div>
-                    <li class="sidebar-item">
-                        <a href="{% url 'tournament_list' %}" class="sidebar-link {% if 'tournaments' in request.path %}active{% endif %}">
-                            <i class="fa-solid fa-trophy"></i> Tournaments
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="{% url 'team_list' %}" class="sidebar-link {% if 'teams' in request.path %}active{% endif %}">
-                            <i class="fa-solid fa-people-group"></i> Teams
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a href="{% url 'player_list' %}" class="sidebar-link {% if 'players' in request.path %}active{% endif %}">
-                            <i class="fa-solid fa-user-ninja"></i> Players Directory
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
+                </ul>
 
-            <!-- Sidebar User / Logout Footer -->
-            <div class="sidebar-user">
-                {% if user.is_authenticated %}
+                <!-- Sidebar User & Logout -->
+                <div class="sidebar-user mt-auto p-3 border-top">
                     <div class="d-flex align-items-center mb-3">
                         <i class="fa-solid fa-circle-user fs-3 text-purple me-2"></i>
                         <div class="overflow-hidden">
@@ -140,78 +120,91 @@
                     </div>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger w-100 rounded-pill">
+                        <button type="submit" class="btn btn-sm btn-outline-danger w-100 rounded-pill fw-bold">
                             <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
                         </button>
                     </form>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-purple w-100 rounded-pill mb-2">Login</a>
-                    <a href="{% url 'register' %}" class="btn btn-outline-purple w-100 rounded-pill">Register</a>
-                {% endif %}
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <div class="app-content">
-            <!-- Mobile Topbar Header -->
-            <div class="mobile-topbar d-lg-none d-flex justify-content-between align-items-center">
-                <button class="btn btn-sm btn-outline-dark rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
-                    <i class="fa-solid fa-bars fs-5"></i>
-                </button>
-                <a href="{% url 'home' %}" class="fw-bold text-decoration-none text-purple fs-5">
-                    <i class="fa-solid fa-trophy text-warning me-1"></i> Naveen Cricket Org
-                </a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'notification_list' %}" class="position-relative text-dark">
-                        <i class="fa-solid fa-bell fs-5"></i>
-                        {% if unread_notifications_count > 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-                        {% endif %}
-                    </a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-sm btn-purple rounded-pill">Login</a>
-                {% endif %}
-            </div>
-
-            <!-- Mobile Offcanvas Sidebar Drawer -->
-            <div class="offcanvas offcanvas-start offcanvas-sidebar p-3" tabindex="-1" id="mobileSidebar">
-                <div class="offcanvas-header pb-2 border-bottom">
-                    <h5 class="offcanvas-title fw-bold text-purple"><i class="fa-solid fa-trophy text-warning me-2"></i>Naveen Cricket Org</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                 </div>
-                <div class="offcanvas-body d-flex flex-column p-0 pt-3">
-                    <ul class="sidebar-menu">
-                        <li class="sidebar-item">
-                            <a href="{% url 'home' %}" class="sidebar-link">
-                                <i class="fa-solid fa-house"></i> Home
-                            </a>
-                        </li>
-                        {% if user.is_authenticated %}
-                            {% if user.is_organizer_role %}
-                                <li class="sidebar-item"><a href="{% url 'organizer_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
-                                <li class="sidebar-item"><a href="{% url 'tournament_list' %}" class="sidebar-link"><i class="fa-solid fa-trophy"></i> My Tournaments</a></li>
+            </aside>
+        {% endif %}
+
+        <!-- Main Content Area (Full width on Login/Register) -->
+        <div class="app-content" {% if not user.is_authenticated or request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' %}style="margin-left: 0 !important; width: 100% !important; min-height: 100vh; background: #f8fafc;"{% endif %}>
+            
+            {% if user.is_authenticated and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+                <!-- Mobile Topbar Header -->
+                <div class="mobile-topbar d-lg-none d-flex justify-content-between align-items-center bg-white border-bottom p-3">
+                    <button class="btn btn-sm btn-outline-dark rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+                        <i class="fa-solid fa-bars fs-5"></i>
+                    </button>
+                    <a href="{% url 'home' %}" class="fw-bold text-decoration-none text-purple fs-5">
+                        <i class="fa-solid fa-trophy text-warning me-1"></i> Naveen Cricket Org
+                    </a>
+                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Desktop Sleek Top Header with User Info & Logout Button -->
+                <div class="d-none d-lg-flex justify-content-between align-items-center bg-white border-bottom px-4 py-2.5 shadow-sm">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-navy fs-6"><i class="fa-solid fa-trophy text-warning me-1"></i> Naveen Cricket Tournament Organization</span>
+                        {% if user.is_admin_role %}
+                            <span class="badge bg-danger rounded-pill px-3 py-1">👑 Super Admin</span>
+                        {% elif user.is_captain_role %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-1">🏏 Team Captain</span>
+                        {% else %}
+                            <span class="badge bg-success rounded-pill px-3 py-1">🏃 Cricket Player</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="small text-muted">Welcome, <strong class="text-dark">{{ user.first_name|default:user.username }}</strong></span>
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold shadow-sm">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mobile Offcanvas Sidebar Drawer -->
+                <div class="offcanvas offcanvas-start offcanvas-sidebar p-3" tabindex="-1" id="mobileSidebar">
+                    <div class="offcanvas-header pb-2 border-bottom">
+                        <h5 class="offcanvas-title fw-bold text-purple"><i class="fa-solid fa-trophy text-warning me-2"></i>Naveen Cricket Org</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body d-flex flex-column p-0 pt-3">
+                        <ul class="sidebar-menu">
+                            {% if user.is_admin_role %}
+                                <li class="sidebar-item"><a href="{% url 'admin_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a></li>
+                                <li class="sidebar-item"><a href="{% url 'tournament_list' %}" class="sidebar-link"><i class="fa-solid fa-trophy"></i> Tournaments</a></li>
+                                <li class="sidebar-item"><a href="{% url 'tournament_create' %}" class="sidebar-link"><i class="fa-solid fa-plus-circle text-success"></i> Create Tournament</a></li>
+                            {% elif user.is_captain_role %}
+                                <li class="sidebar-item"><a href="{% url 'captain_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Captain Dashboard</a></li>
+                                <li class="sidebar-item"><a href="{% url 'tournament_list' %}" class="sidebar-link"><i class="fa-solid fa-trophy"></i> Tournaments</a></li>
                             {% else %}
                                 <li class="sidebar-item"><a href="{% url 'player_dashboard' %}" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
                                 <li class="sidebar-item"><a href="{% url 'edit_player_profile' %}" class="sidebar-link"><i class="fa-solid fa-id-card"></i> My Profile</a></li>
                             {% endif %}
                             <li class="sidebar-item"><a href="{% url 'team_list' %}" class="sidebar-link"><i class="fa-solid fa-people-group"></i> Teams</a></li>
                             <li class="sidebar-item"><a href="{% url 'notification_list' %}" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a></li>
-                        {% endif %}
-                    </ul>
-                    
-                    <div class="mt-auto pt-3 border-top">
-                        {% if user.is_authenticated %}
+                        </ul>
+                        
+                        <div class="mt-auto pt-3 border-top">
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger w-100 rounded-pill">Logout</button>
+                                <button type="submit" class="btn btn-outline-danger w-100 rounded-pill fw-bold">
+                                    <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                                </button>
                             </form>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-purple w-100 rounded-pill mb-2">Login</a>
-                            <a href="{% url 'register' %}" class="btn btn-outline-purple w-100 rounded-pill">Register</a>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
 
             <!-- Flash Messages -->
             <div class="container-fluid px-4 mt-3">
@@ -231,41 +224,7 @@
                 {% block content %}{% endblock %}
             </main>
 
-            <!-- Professional Light Purple Footer -->
-            <footer>
-                <div class="container-fluid px-4">
-                    <div class="row gy-4">
-                        <div class="col-md-5">
-                            <h5 class="fw-bold text-dark mb-2">
-                                <i class="fa-solid fa-trophy text-purple me-2"></i>Naveen Cricket Tournament Organization
-                            </h5>
-                            <p class="small text-muted mb-0">Official Cricket Tournament Management Platform for Village Teams & Clubs. Empowering team captains, squads, players, and match fixtures.</p>
-                        </div>
-                        <div class="col-md-3">
-                            <h6 class="fw-bold text-dark mb-2">Quick Links</h6>
-                            <ul class="list-unstyled small mb-0">
-                                <li><a href="{% url 'home' %}">Home</a></li>
-                                <li><a href="{% url 'tournament_list' %}">Tournaments</a></li>
-                                <li><a href="{% url 'team_list' %}">Teams</a></li>
-                                <li><a href="{% url 'player_list' %}">Players Directory</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4">
-                            <h6 class="fw-bold text-dark mb-2">Platform & Location</h6>
-                            <p class="small text-muted mb-2"><i class="fa-solid fa-location-dot text-danger me-1"></i>Tamil Nadu, India</p>
-                            <div class="d-flex gap-2">
-                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-purple rounded-pill">Player Login</a>
-                                <a href="{% url 'register' %}" class="btn btn-sm btn-purple rounded-pill">Register</a>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="my-4 border-secondary opacity-10">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-muted">
-                        <p class="mb-0">&copy; 2026 Sports Tournament. All Rights Reserved.</p>
-                        <p class="mb-0">Designed for Tamil Nadu Cricket</p>
-                    </div>
-                </div>
-            </footer>
+            <!-- Footer completely removed as requested -->
         </div>
     </div>
 

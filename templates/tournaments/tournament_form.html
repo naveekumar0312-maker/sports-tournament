@@ -1,14 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ title }} | Sports Tournament{% endblock %}
+{% block title %}{{ title }} | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center my-4">
     <div class="col-lg-9">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
             <div class="bg-navy p-4 text-white">
-                <h3 class="fw-bold mb-1"><i class="fa-solid fa-trophy text-warning me-2"></i>{{ title }}</h3>
-                <p class="small text-slate-300 mb-0">Fill in the tournament details and select the Tamil Nadu district location.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="fw-bold mb-1"><i class="fa-solid fa-trophy text-warning me-2"></i>{{ title }}</h3>
+                        <p class="small text-slate-300 mb-0">Host an official cricket tournament in Naveen Cricket Tournament Organization</p>
+                    </div>
+                    <a href="{% url 'tournament_list' %}" class="btn btn-sm btn-outline-light rounded-pill px-3">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Tournaments
+                    </a>
+                </div>
             </div>
             <div class="card-body p-4 p-md-5">
                 <form method="post" enctype="multipart/form-data">
@@ -16,87 +23,86 @@
                     
                     <div class="row g-3 mb-4">
                         <div class="col-md-8">
-                            <label class="form-label fw-bold">Tournament Name *</label>
+                            <label class="form-label fw-bold text-navy">Tournament Name *</label>
                             {{ form.name }}
+                            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold">Tournament Format *</label>
+                            <label class="form-label fw-bold text-navy">Tournament Format *</label>
                             {{ form.tournament_type }}
+                            {% if form.tournament_type.errors %}<div class="text-danger small">{{ form.tournament_type.errors }}</div>{% endif %}
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-bold">Description *</label>
+                            <label class="form-label fw-bold text-navy">Description / Tournament Rules *</label>
                             {{ form.description }}
+                            {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
                         </div>
                     </div>
 
-                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-location-dot text-danger me-2"></i>Tamil Nadu Location</h5>
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-location-dot text-danger me-2"></i>Tournament Venue</h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">District *</label>
-                            {{ form.district }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Taluk / Area</label>
-                            {{ form.taluk }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Village</label>
-                            {{ form.village }}
-                        </div>
                         <div class="col-12">
-                            <label class="form-label fw-bold">Venue / Stadium Address *</label>
+                            <label class="form-label fw-bold text-navy">Venue / Ground Name & City *</label>
                             {{ form.venue }}
+                            {% if form.venue.errors %}<div class="text-danger small">{{ form.venue.errors }}</div>{% endif %}
+                            <small class="text-muted">e.g. Naveen Sports Ground, Pollachi Road, Coimbatore</small>
                         </div>
                     </div>
 
-
-                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Schedule & Fees</h5>
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-calendar-days text-primary me-2"></i>Schedule & Team Capacity</h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Tournament Start Date</label>
+                            <label class="form-label fw-bold text-navy">Start Date *</label>
                             {{ form.start_date }}
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Tournament End Date</label>
+                            <label class="form-label fw-bold text-navy">End Date *</label>
                             {{ form.end_date }}
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Reg. Start Date</label>
+                            <label class="form-label fw-bold text-navy">Reg. Opens</label>
                             {{ form.registration_start_date }}
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Reg. End Date</label>
+                            <label class="form-label fw-bold text-navy">Reg. Closes</label>
                             {{ form.registration_end_date }}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Entry Fee (₹)</label>
+                    </div>
+
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-wallet text-emerald me-2"></i>Fees, Contact & Status</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Entry Fee (₹)</label>
                             {{ form.entry_fee }}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Max Teams Allowed</label>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Max Teams</label>
                             {{ form.max_teams }}
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Status</label>
-                            {{ form.status }}
-                        </div>
-                    </div>
-
-                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-address-book text-success me-2"></i>Contact Info</h5>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Contact Phone Number</label>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Contact Phone *</label>
                             {{ form.contact_phone }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Contact Email</label>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Contact Email *</label>
                             {{ form.contact_email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-navy">Tournament Status</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-navy">Banner Image</label>
+                            {{ form.banner }}
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-emerald w-100 py-3 rounded-pill shadow">
-                        <i class="fa-solid fa-check-circle me-2"></i> Save Tournament Details
-                    </button>
+                    <div class="d-flex justify-content-end gap-3 mt-4 border-top pt-4">
+                        <a href="{% url 'tournament_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                        <button type="submit" class="btn btn-emerald rounded-pill px-5 shadow fw-bold">
+                            <i class="fa-solid fa-check-circle me-2"></i> Publish Tournament
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

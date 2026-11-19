@@ -23,13 +23,7 @@
                 {% endif %}
             </div>
             <h3 class="fw-bold mb-1 text-navy">{{ player_profile.full_name|default:user.username }}</h3>
-            <p class="small mb-2 text-muted">
-                <i class="fa-solid fa-location-dot text-danger me-1"></i>
-                {% if player_profile.district %}{{ player_profile.district.name }}{% else %}Tamil Nadu{% endif %}
-                {% if player_profile.taluk %} &bull; {{ player_profile.taluk.name }}{% endif %}
-                {% if player_profile.village %} &bull; {{ player_profile.village.name }}{% endif %}
-            </p>
-            <div class="d-flex flex-wrap gap-2">
+            <div class="d-flex flex-wrap gap-2 mb-2 mt-2">
                 {% if player_profile.batting_style %}
                     <span class="badge bg-purple"><i class="fa-solid fa-hand-holding-hand me-1"></i> {{ player_profile.get_batting_style_display }}</span>
                 {% endif %}
@@ -64,8 +58,7 @@
                             <span class="badge bg-dark">{{ my_team.short_code }}</span>
                         </div>
                         <p class="small mb-2 text-muted">
-                            <i class="fa-solid fa-user-crown text-warning me-1"></i> Captain: <strong>{{ my_team.captain.full_name|default:"TBD" }}</strong> 
-                            &bull; <i class="fa-solid fa-location-dot text-danger me-1"></i> {{ my_team.district.name }}
+                            <i class="fa-solid fa-user-crown text-warning me-1"></i> Captain: <strong>{{ my_team.captain.full_name|default:"TBD" }}</strong>
                         </p>
                         <p class="small mb-3 text-muted">
                             <i class="fa-solid fa-users text-primary me-1"></i> Squad: <strong>{{ my_team.members.count }} Players</strong>
@@ -156,8 +149,7 @@
                         </div>
                         <h5 class="fw-bold text-navy mb-1">{{ team.name }}</h5>
                         <p class="small text-muted mb-2">
-                            <i class="fa-solid fa-user-shield me-1 text-warning"></i> Captain: <strong>{{ team.captain.full_name|default:team.created_by.username }}</strong><br>
-                            <i class="fa-solid fa-location-dot me-1 text-danger"></i> {{ team.district.name|default:"Tamil Nadu" }}
+                            <i class="fa-solid fa-user-shield me-1 text-warning"></i> Captain: <strong>{{ team.captain.full_name|default:team.created_by.username }}</strong>
                         </p>
                         <div class="mt-auto pt-2 border-top">
                             {% if my_team == team %}

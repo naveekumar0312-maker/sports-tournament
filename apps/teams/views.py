@@ -10,9 +10,10 @@ from matches.models import Match
 from notifications.services import create_notification, notify_team_members
 from notifications.models import Notification
 
+@login_required(login_url='login')
 def team_list_view(request):
-    teams = Team.objects.all().select_related('district', 'captain', 'created_by')
-    player_profile = getattr(request.user, 'player_profile', None) if request.user.is_authenticated else None
+    teams = Team.objects.all().select_related('captain', 'created_by')
+    player_profile = getattr(request.user, 'player_profile', None)
     
     pending_team_ids = []
     if player_profile:
@@ -27,6 +28,7 @@ def team_list_view(request):
         'pending_team_ids': pending_team_ids,
     })
 
+@login_required(login_url='login')
 def team_detail_view(request, pk):
     team = get_object_or_404(Team.objects.select_related('district', 'taluk', 'captain', 'vice_captain', 'created_by'), pk=pk)
     members = team.members.select_related('user', 'district').all()

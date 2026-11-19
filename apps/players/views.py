@@ -7,30 +7,26 @@ from locations.models import District
 
 from tournaments.models import Tournament
 
+@login_required(login_url='login')
 def player_list_view(request):
-    players = PlayerProfile.objects.all().select_related('district', 'taluk', 'village', 'current_team')
+    players = PlayerProfile.objects.all().select_related('current_team')
 
     role_filter = request.GET.get('role')
-    district_filter = request.GET.get('district')
     search_query = request.GET.get('q')
 
     if role_filter:
         players = players.filter(playing_role=role_filter)
-    if district_filter:
-        players = players.filter(district_id=district_filter)
     if search_query:
         players = players.filter(full_name__icontains=search_query)
 
-    districts = District.objects.all()
-
     return render(request, 'players/player_list.html', {
         'players': players,
-        'districts': districts,
         'selected_role': role_filter,
-        'selected_district': district_filter,
         'search_query': search_query,
+        'roles': PlayerProfile.PlayingRole.choices,
     })
 
+@login_required(login_url='login')
 def player_profile_detail_view(request, pk):
     profile = get_object_or_404(
         PlayerProfile.objects.select_related('user', 'district', 'taluk', 'village', 'current_team'),

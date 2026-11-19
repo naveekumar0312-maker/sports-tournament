@@ -22,11 +22,7 @@
             </div>
             <h2 class="fw-bold mb-1 text-navy">{{ active_team.name }} <span class="text-muted fs-5">({{ active_team.short_code }})</span></h2>
             <p class="text-muted small mb-0">
-                <i class="fa-solid fa-location-dot text-danger me-1"></i>
-                {% if active_team.district %}{{ active_team.district.name }}{% endif %}
-                {% if active_team.taluk %} &bull; {{ active_team.taluk.name }}{% endif %}
-                {% if active_team.village %} &bull; {{ active_team.village.name }}{% endif %}
-                &bull; Created by <strong>{{ user.get_full_name|default:user.username }}</strong>
+                Created by <strong>{{ user.get_full_name|default:user.username }}</strong>
             </p>
         </div>
         <div class="col-md-3 text-md-end mt-3 mt-md-0">
@@ -85,9 +81,6 @@
                                         </a>
                                         <div class="small text-muted">
                                             <span class="badge bg-light text-dark border me-1">{{ req.player.get_playing_role_display }}</span>
-                                            {% if req.player.district %}
-                                                <i class="fa-solid fa-location-dot text-danger me-1"></i>{{ req.player.district.name }}
-                                            {% endif %}
                                         </div>
                                         {% if req.message %}
                                             <small class="text-primary d-block mt-1 fst-italic">"{{ req.message }}"</small>
@@ -199,7 +192,7 @@
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark border me-1">{{ tourney.get_tournament_type_display }}</span>
-                                <small class="d-block text-muted mt-1"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ tourney.venue }}, {{ tourney.district.name }}</small>
+                                <small class="d-block text-muted mt-1"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ tourney.venue }}</small>
                             </td>
                             <td>
                                 <small class="d-block fw-bold"><i class="fa-regular fa-calendar me-1"></i>{{ tourney.start_date|date:"d M Y" }}</small>
@@ -267,7 +260,6 @@
                         <div>
                             <strong class="text-navy d-block">{{ p.full_name }}</strong>
                             <small class="badge bg-white text-dark border">{{ p.get_playing_role_display }}</small>
-                            <small class="d-block text-muted mt-1"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ p.district.name|default:"Tamil Nadu" }}</small>
                         </div>
                         <form method="post" action="{% url 'add_player_to_team' active_team.id %}">
                             {% csrf_token %}

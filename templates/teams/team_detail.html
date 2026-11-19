@@ -16,11 +16,8 @@
                     <span class="badge bg-emerald mb-1">{{ team.short_code }}</span>
                     <h2 class="fw-bold mb-1 text-navy">{{ team.name }}</h2>
                     <p class="small mb-0 text-muted">
-                        <i class="fa-solid fa-location-dot text-danger me-1"></i>
-                        {{ team.district.name }} District
-                        {% if team.taluk %} &bull; {{ team.taluk.name }}{% endif %}
-                        {% if team.village %} &bull; {{ team.village.name }}{% endif %}
-                        &bull; Captain: <strong>{{ team.captain.full_name|default:team.created_by.username }}</strong>
+                        <i class="fa-solid fa-user-shield text-warning me-1"></i> Captain: <strong>{{ team.captain.full_name|default:team.created_by.username }}</strong>
+                        &bull; Squad: <strong>{{ team.members.count }} Players</strong>
                     </p>
                 </div>
             </div>
@@ -159,7 +156,7 @@
                             <select name="player_id" class="form-select bg-white" required>
                                 <option value="">-- Select Available Player --</option>
                                 {% for p in available_players %}
-                                    <option value="{{ p.id }}">{{ p.full_name }} ({{ p.get_playing_role_display }} - {{ p.district.name|default:"Tamil Nadu" }})</option>
+                                    <option value="{{ p.id }}">{{ p.full_name }} ({{ p.get_playing_role_display }})</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -182,7 +179,7 @@
                         <a href="{% url 'tournament_detail' reg.tournament.id %}" class="fw-bold text-decoration-none d-block text-navy">
                             {{ reg.tournament.name }}
                         </a>
-                        <small class="text-muted"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ reg.tournament.district.name }}</small>
+                        <small class="text-muted"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ reg.tournament.venue }}</small>
                     </li>
                 {% empty %}
                     <li class="list-group-item px-0 py-3 bg-white text-muted">Not registered in any tournaments yet.</li>

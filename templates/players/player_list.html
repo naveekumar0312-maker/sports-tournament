@@ -1,22 +1,25 @@
 {% extends 'base.html' %}
 
-{% block title %}Player Directory | Sports Tournament{% endblock %}
+{% block title %}Player Directory | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold text-navy mb-1"><i class="fa-solid fa-user-ninja text-emerald me-2"></i>Tamil Nadu Player Directory</h2>
-        <p class="text-muted small mb-0">Discover cricket players across Tamil Nadu by playing role, district, and batting/bowling style.</p>
+        <h2 class="fw-bold text-navy mb-1"><i class="fa-solid fa-user-ninja text-emerald me-2"></i>Naveen Cricket Org - Player Directory</h2>
+        <p class="text-muted small mb-0">Discover registered cricket players by name, playing role, and style.</p>
     </div>
 </div>
 
-<!-- Filters Bar -->
+<!-- Filters Bar (No Districts) -->
 <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
     <form method="get" action="{% url 'player_list' %}" class="row g-3 align-items-center">
-        <div class="col-md-4">
-            <input type="text" name="q" class="form-control" placeholder="Search player name..." value="{{ search_query|default:'' }}">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Search player name..." value="{{ search_query|default:'' }}">
+            </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <select name="role" class="form-select">
                 <option value="">-- All Playing Roles --</option>
                 <option value="BATSMAN" {% if selected_role == 'BATSMAN' %}selected{% endif %}>Batsman</option>
@@ -25,16 +28,9 @@
                 <option value="WICKET_KEEPER" {% if selected_role == 'WICKET_KEEPER' %}selected{% endif %}>Wicket-Keeper</option>
             </select>
         </div>
-        <div class="col-md-3">
-            <select name="district" class="form-select">
-                <option value="">-- All TN Districts --</option>
-                {% for d in districts %}
-                    <option value="{{ d.id }}" {% if selected_district == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-navy text-white rounded-pill w-100"><i class="fa-solid fa-search"></i> Search</button>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-navy text-white rounded-pill w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+            <a href="{% url 'player_list' %}" class="btn btn-outline-secondary rounded-pill" title="Reset"><i class="fa-solid fa-rotate-left"></i></a>
         </div>
     </form>
 </div>
@@ -45,19 +41,23 @@
         <div class="col-md-6 col-lg-3">
             <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white text-center d-flex flex-column">
                 <div class="mb-3">
-                    <i class="fa-solid fa-circle-user fs-1 text-warning p-3 bg-light rounded-circle"></i>
+                    {% if player.profile_photo %}
+                        <img src="{{ player.profile_photo.url }}" class="rounded-circle shadow-sm" style="width: 70px; height: 70px; object-fit: cover;" alt="">
+                    {% else %}
+                        <i class="fa-solid fa-circle-user fs-1 text-warning p-3 bg-light rounded-circle"></i>
+                    {% endif %}
                 </div>
                 <h5 class="fw-bold text-navy mb-1">{{ player.full_name }}</h5>
                 <span class="badge bg-emerald mb-2 mx-auto">{{ player.get_playing_role_display }}</span>
-                <p class="small text-muted mb-3">
-                    {% if player.district %}
-                        <i class="fa-solid fa-location-dot text-danger me-1"></i>{{ player.district.name }}{% if player.taluk %}, {{ player.taluk.name }}{% endif %}
-                    {% else %}
-                        <i class="fa-solid fa-location-dot text-secondary me-1"></i>Not Provided
-                    {% endif %}
-                </p>
-
                 
+                <div class="mb-2">
+                    {% if player.current_team %}
+                        <span class="badge bg-success-subtle text-success border border-success"><i class="fa-solid fa-shield me-1"></i> {{ player.current_team.name }}</span>
+                    {% else %}
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning"><i class="fa-solid fa-user-clock me-1"></i> Free Agent</span>
+                    {% endif %}
+                </div>
+
                 <div class="bg-light p-2 rounded small mb-3">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted">Batting:</span>
@@ -70,12 +70,16 @@
                 </div>
 
                 <div class="mt-auto">
-                    <a href="{% url 'player_profile_detail' player.id %}" class="btn btn-outline-dark btn-sm rounded-pill w-100">View Profile</a>
+                    <a href="{% url 'player_profile_detail' player.id %}" class="btn btn-outline-dark btn-sm w-100 rounded-pill">View Career Stats</a>
                 </div>
             </div>
         </div>
     {% empty %}
-        <div class="col-12 text-center py-5 text-muted">No players found matching criteria.</div>
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-users-slash fs-1 text-secondary opacity-50 mb-3 d-block"></i>
+            <h5>No Players Found</h5>
+            <small>Try adjusting your search criteria.</small>
+        </div>
     {% endfor %}
 </div>
 {% endblock %}

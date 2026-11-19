@@ -7,22 +7,14 @@ from locations.models import District
 from teams.models import Team, TournamentRegistration
 from notifications.services import notify_tournament_participants, create_notification
 
+@login_required(login_url='login')
 def tournament_list_view(request):
-    tournaments = Tournament.objects.all().select_related('district', 'taluk', 'village', 'organizer')
+    tournaments = Tournament.objects.all().select_related('organizer')
     
-    district_filter = request.GET.get('district')
-    taluk_filter = request.GET.get('taluk')
-    village_filter = request.GET.get('village')
     status_filter = request.GET.get('status')
     type_filter = request.GET.get('type')
     search_query = request.GET.get('q')
 
-    if district_filter:
-        tournaments = tournaments.filter(district_id=district_filter)
-    if taluk_filter:
-        tournaments = tournaments.filter(taluk_id=taluk_filter)
-    if village_filter:
-        tournaments = tournaments.filter(village_id=village_filter)
     if status_filter:
         tournaments = tournaments.filter(status=status_filter)
     if type_filter:
@@ -30,22 +22,19 @@ def tournament_list_view(request):
     if search_query:
         tournaments = tournaments.filter(name__icontains=search_query)
 
-    districts = District.objects.all()
-
     return render(request, 'tournaments/tournament_list.html', {
         'tournaments': tournaments,
-        'districts': districts,
-        'selected_district': district_filter,
-        'selected_taluk': taluk_filter,
-        'selected_village': village_filter,
         'selected_status': status_filter,
         'selected_type': type_filter,
         'search_query': search_query,
+        'tournament_types': Tournament.TournamentType.choices,
+        'tournament_statuses': Tournament.Status.choices,
     })
 
 
+@login_required(login_url='login')
 def tournament_detail_view(request, pk):
-    tournament = get_object_or_404(Tournament.objects.select_related('district', 'taluk', 'organizer'), pk=pk)
+    tournament = get_object_or_404(Tournament.objects.select_related('organizer'), pk=pk)
     registrations = tournament.registrations.select_related('team').all()
     matches = tournament.matches.select_related('team_a', 'team_b', 'winner', 'man_of_the_match').all()
     prizes = tournament.prizes.all()
