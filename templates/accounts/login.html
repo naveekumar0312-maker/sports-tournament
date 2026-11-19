@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Login | Sports Tournament{% endblock %}
+{% block title %}Login | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center my-4">
-    <div class="col-md-6 col-lg-5">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="bg-navy p-4 text-center text-white">
+<div class="row justify-content-center my-3">
+    <div class="col-lg-7 col-md-9">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+            <!-- Header Banner -->
+            <div class="bg-navy p-4 text-center text-white position-relative">
                 <i class="fa-solid fa-trophy text-warning fs-1 mb-2"></i>
-                <h3 class="fw-bold mb-1">Welcome Back</h3>
-                <p class="small text-slate-300 mb-0">Login to Sports Tournament Tamil Nadu</p>
+                <h3 class="fw-bold mb-1">Naveen Cricket Tournament Organization</h3>
+                <p class="small text-slate-300 mb-0">Official Portal Login &bull; Super Admin, Team Captains & Players</p>
             </div>
-            <div class="card-body p-4 p-md-5">
 
+            <div class="card-body p-4 p-md-5">
                 <!-- Error Message Alert directly above login form -->
                 {% if error_message %}
                     <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
@@ -22,46 +23,126 @@
                     </div>
                 {% endif %}
 
-                <form method="post" action="{% url 'login' %}">
+                <!-- Role Selector Indicator Badges -->
+                <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                    <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 rounded-pill">
+                        <i class="fa-solid fa-crown me-1"></i> Super Admin
+                    </span>
+                    <span class="badge bg-warning-subtle text-dark border border-warning px-3 py-2 rounded-pill">
+                        <i class="fa-solid fa-shield-halved me-1"></i> Captain / Team Owner
+                    </span>
+                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">
+                        <i class="fa-solid fa-user-ninja me-1"></i> Cricket Player
+                    </span>
+                </div>
+
+                <!-- Login Form -->
+                <form method="post" action="{% url 'login' %}" id="loginForm">
                     {% csrf_token %}
                     
                     <div class="mb-3">
-                        <label for="id_username" class="form-label fw-bold">Username</label>
+                        <label for="id_username" class="form-label fw-bold text-navy">Username</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" name="username" class="form-control" placeholder="Enter username" value="{{ username_val|default:'' }}" id="id_username">
+                            <span class="input-group-text bg-light text-navy"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" name="username" class="form-control" placeholder="Enter your username" value="{{ username_val|default:'' }}" id="id_username" required autofocus>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="id_password" class="form-label fw-bold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" name="password" class="form-control" placeholder="Enter password" id="id_password">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label for="id_password" class="form-label fw-bold text-navy mb-0">Password</label>
+                        </div>
+                        <div class="input-group mt-1">
+                            <span class="input-group-text bg-light text-navy"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="Enter your password" id="id_password" required>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-emerald w-100 py-2.5 rounded-pill shadow-sm mb-3">
-                        <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Account
+                    <button type="submit" class="btn btn-emerald w-100 py-3 rounded-pill shadow fw-bold fs-6 mb-3">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Login to Portal
                     </button>
                 </form>
 
-                <!-- Demo Credentials Helper -->
-                <div class="mt-4 p-3 bg-light rounded-3 border">
-                    <h6 class="fw-bold text-dark mb-2 small"><i class="fa-solid fa-key text-warning me-1"></i> Quick Demo Logins:</h6>
-                    <ul class="list-unstyled small mb-0 text-muted">
-                        <li><strong>Organizer:</strong> <code>organizer_chennai</code> / <code>password123</code></li>
-                        <li><strong>Player:</strong> <code>player_vijay</code> / <code>password123</code></li>
-                        <li><strong>Admin:</strong> <code>admin</code> / <code>admin123</code> (at <code>/admin/</code>)</li>
-                    </ul>
+                <!-- 1-Click Quick Demo Credentials Panel -->
+                <div class="mt-4 p-3 bg-light rounded-4 border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold text-navy mb-0 small">
+                            <i class="fa-solid fa-bolt text-warning me-1"></i> 1-Click Demo Accounts (Click to Auto-fill):
+                        </h6>
+                        <span class="badge bg-secondary">Testing</span>
+                    </div>
+
+                    <!-- Super Admin -->
+                    <div class="mb-2">
+                        <small class="fw-bold text-danger d-block mb-1"><i class="fa-solid fa-crown me-1"></i> Super Admin (Naveen):</small>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 me-1 mb-1 fill-btn" data-user="admin" data-pass="admin@123">
+                            👑 <strong>admin</strong> (admin@123)
+                        </button>
+                    </div>
+
+                    <!-- 2 Captains -->
+                    <div class="mb-2">
+                        <small class="fw-bold text-warning-emphasis d-block mb-1"><i class="fa-solid fa-shield-halved me-1"></i> 2 Team Captains / Owners:</small>
+                        <button type="button" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3 py-1 me-1 mb-1 fill-btn" data-user="captain_kovai" data-pass="captain@123">
+                            🏏 <strong>captain_kovai</strong> (Kovai Kings XI)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3 py-1 me-1 mb-1 fill-btn" data-user="captain_chennai" data-pass="captain@123">
+                            🏏 <strong>captain_chennai</strong> (Chennai Strikers)
+                        </button>
+                    </div>
+
+                    <!-- 3 Players -->
+                    <div>
+                        <small class="fw-bold text-success d-block mb-1"><i class="fa-solid fa-user-ninja me-1"></i> 3 Cricket Players (Free Agents):</small>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 me-1 mb-1 fill-btn" data-user="player_karthik" data-pass="player@123">
+                            🏃 <strong>player_karthik</strong> (Batsman)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 me-1 mb-1 fill-btn" data-user="player_vijay" data-pass="player@123">
+                            🏃 <strong>player_vijay</strong> (Bowler)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 me-1 mb-1 fill-btn" data-user="player_suresh" data-pass="player@123">
+                            🏃 <strong>player_suresh</strong> (All-Rounder)
+                        </button>
+                    </div>
                 </div>
 
-                <div class="text-center mt-3 small">
-                    <span class="text-muted">Don't have an account yet?</span>
-                    <a href="{% url 'register' %}" class="fw-bold text-emerald ms-1">Register Now</a>
+                <!-- Registration Actions -->
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted small mb-2">Pudhusaa register panna poringala? Choose unga account type:</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="{% url 'register' %}" class="btn btn-outline-purple btn-sm rounded-pill px-3">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Register as Team Captain
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-emerald btn-sm rounded-pill px-3">
+                            <i class="fa-solid fa-user-plus me-1"></i> Register as Cricket Player
+                        </a>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const userField = document.getElementById("id_username");
+        const passField = document.getElementById("id_password");
+        const fillButtons = document.querySelectorAll(".fill-btn");
+
+        fillButtons.forEach(function(btn) {
+            btn.addEventListener("click", function() {
+                const user = this.getAttribute("data-user");
+                const pass = this.getAttribute("data-pass");
+                if (userField && passField) {
+                    userField.value = user;
+                    passField.value = pass;
+                    // Visual feedback
+                    btn.classList.add("shadow");
+                    setTimeout(() => btn.classList.remove("shadow"), 400);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

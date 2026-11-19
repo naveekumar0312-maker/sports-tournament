@@ -17,12 +17,10 @@ urlpatterns = [
     # Django Admin Panel
     path('admin/', admin.site.urls),
 
-    # Main Home Page
-    path('', home_view, name='home'),
-
-    # Clean Common Auth URLs
-    path('register/', register_view, name='register'),
+    # Port Opens Directly to Login Page
+    path('', login_view, name='home'),
     path('login/', login_view, name='login'),
+    path('register/', register_view, name='register'),
     path('logout/', logout_view, name='logout'),
     path('profile/', profile_view, name='profile'),
     
