@@ -129,12 +129,10 @@ def match_update_score_view(request, pk):
     if match.non_striker:
         available_next_batsmen = available_next_batsmen.exclude(id=match.non_striker.id)
 
-    # Check if over is completed (current_overs has .0, e.g. 1.0, 2.0 and current_overs > 0)
-    current_ov_val = float(match.current_overs)
-    is_over_complete = (current_ov_val > 0) and (round((current_ov_val - int(current_ov_val)) * 10) == 0)
-
+    # Check if a new bowler needs to be chosen for next over:
+    # Over is complete when current_overs is whole number (e.g. 1.0, 2.0) and current_bowler is None
     needs_new_batsman = (match.striker is None)
-    needs_new_bowler = is_over_complete or (match.current_bowler is None)
+    needs_new_bowler = (match.current_bowler is None)
 
     return render(request, 'matches/match_score_form.html', {
         'form': form,
@@ -147,7 +145,6 @@ def match_update_score_view(request, pk):
         'available_next_batsmen': available_next_batsmen,
         'needs_new_batsman': needs_new_batsman,
         'needs_new_bowler': needs_new_bowler,
-        'is_over_complete': is_over_complete,
         'striker_perf': striker_perf,
         'non_striker_perf': non_striker_perf,
         'bowler_perf': bowler_perf,
