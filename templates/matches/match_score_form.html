@@ -1,63 +1,297 @@
 {% extends 'base.html' %}
 
-{% block title %}Enter Scores | {{ match.team_a.short_code }} vs {{ match.team_b.short_code }}{% endblock %}
+{% block title %}Live Scoreboard & Scoring | {{ match.team_a.short_code }} vs {{ match.team_b.short_code }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center my-4">
-    <div class="col-md-9 col-lg-8">
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-            <div class="bg-purple p-4 text-white">
-                <h3 class="fw-bold mb-1"><i class="fa-solid fa-pen-to-square me-2"></i>Match Scorecard & Result Entry</h3>
-                <p class="small text-slate-200 mb-0">{{ match.team_a.name }} vs {{ match.team_b.name }} ({{ match.tournament.name }})</p>
+    <div class="col-lg-10">
+
+        <!-- Top Live Scoreboard Panel -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 bg-navy text-white">
+            <div class="p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fa-solid fa-circle-dot me-1"></i> LIVE MATCH CONTROLLER</span>
+                    <span class="badge bg-white text-dark fw-bold px-3 py-2 rounded-pill">{{ match.tournament.name }} • {{ match.round_name }}</span>
+                </div>
+
+                <!-- Match Live Score Banner -->
+                <div class="row align-items-center text-center my-3 g-3">
+                    <div class="col-md-5 text-md-end">
+                        <h4 class="fw-bold mb-1 {% if match.current_batting_team == match.team_a %}text-warning{% else %}text-white{% endif %}">
+                            {{ match.team_a.name }} {% if match.current_batting_team == match.team_a %}<i class="fa-solid fa-baseball-bat-ball text-warning ms-1"></i>{% endif %}
+                        </h4>
+                        <div class="display-6 fw-bold">{{ match.team_a_score|default:"0/0 (0.0 ov)" }}</div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill">VS</span>
+                    </div>
+                    <div class="col-md-5 text-md-start">
+                        <h4 class="fw-bold mb-1 {% if match.current_batting_team == match.team_b %}text-warning{% else %}text-white{% endif %}">
+                            {{ match.team_b.name }} {% if match.current_batting_team == match.team_b %}<i class="fa-solid fa-baseball-bat-ball text-warning ms-1"></i>{% endif %}
+                        </h4>
+                        <div class="display-6 fw-bold">{{ match.team_b_score|default:"Yet to Bat" }}</div>
+                    </div>
+                </div>
+
+                <!-- Recent deliveries banner -->
+                {% if match.recent_balls %}
+                <div class="mt-3 text-center">
+                    <span class="text-white-50 small me-2">This Over / Recent:</span>
+                    {% for ball in match.recent_balls.split %}
+                        <span class="badge {% if ball == 'W' %}bg-danger{% elif ball == '4' %}bg-primary{% elif ball == '6' %}bg-warning text-dark{% else %}bg-secondary{% endif %} rounded-circle p-2 mx-1" style="width: 32px; height: 32px; line-height: 16px; font-weight: bold;">
+                            {{ ball|cut:"," }}
+                        </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 1. Real-time Live Batting & Bowling Controller (Vinoth, Naveen opening vs Bowler) -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+            <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold text-navy mb-1"><i class="fa-solid fa-gamepad text-primary me-2"></i>Live Ball-by-Ball Scoreboard Controller</h5>
+                    <p class="small text-muted mb-0">Select Opening Batsmen (Striker & Non-Striker) and Bowler, then record real-time runs</p>
+                </div>
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#lineupSetup">
+                    <i class="fa-solid fa-users-gear me-1"></i> Change Opening Lineup
+                </button>
+            </div>
+
+            <div class="card-body p-4">
+                <!-- Lineup Setup Form (Collapse) -->
+                <div class="collapse {% if not match.striker or not match.current_bowler %}show{% endif %} mb-4 p-4 rounded-4 bg-light border" id="lineupSetup">
+                    <h6 class="fw-bold text-navy mb-3"><i class="fa-solid fa-user-check text-emerald me-1"></i> Set On-Crease Batsmen & Opening Bowler</h6>
+                    <form method="post" action="{% url 'match_set_lineup' match.id %}">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-navy">Current Batting Team</label>
+                                <select name="batting_team_id" class="form-select" required>
+                                    <option value="{{ match.team_a.id }}" {% if match.current_batting_team == match.team_a %}selected{% endif %}>{{ match.team_a.name }}</option>
+                                    <option value="{{ match.team_b.id }}" {% if match.current_batting_team == match.team_b %}selected{% endif %}>{{ match.team_b.name }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-navy">Striker Batsman *</label>
+                                <select name="striker_id" class="form-select" required>
+                                    <option value="">-- Choose Striker (e.g. Naveen) --</option>
+                                    <optgroup label="{{ match.team_a.name }}">
+                                        {% for p in team_a_players %}
+                                            <option value="{{ p.id }}" {% if match.striker.id == p.id %}selected{% endif %}>{{ p.full_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    <optgroup label="{{ match.team_b.name }}">
+                                        {% for p in team_b_players %}
+                                            <option value="{{ p.id }}" {% if match.striker.id == p.id %}selected{% endif %}>{{ p.full_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-navy">Non-Striker Batsman *</label>
+                                <select name="non_striker_id" class="form-select" required>
+                                    <option value="">-- Choose Non-Striker (e.g. Vinoth) --</option>
+                                    <optgroup label="{{ match.team_a.name }}">
+                                        {% for p in team_a_players %}
+                                            <option value="{{ p.id }}" {% if match.non_striker.id == p.id %}selected{% endif %}>{{ p.full_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    <optgroup label="{{ match.team_b.name }}">
+                                        {% for p in team_b_players %}
+                                            <option value="{{ p.id }}" {% if match.non_striker.id == p.id %}selected{% endif %}>{{ p.full_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-navy">Current Bowler *</label>
+                                <select name="bowler_id" class="form-select" required>
+                                    <option value="">-- Choose Bowler --</option>
+                                    <optgroup label="{{ match.team_a.name }}">
+                                        {% for p in team_a_players %}
+                                            <option value="{{ p.id }}" {% if match.current_bowler.id == p.id %}selected{% endif %}>{{ p.full_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    <optgroup label="{{ match.team_b.name }}">
+                                        {% for p in team_b_players %}
+                                            <option value="{{ p.id }}" {% if match.current_bowler.id == p.id %}selected{% endif %}>{{ p.full_name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-emerald rounded-pill px-4 fw-bold">
+                                    <i class="fa-solid fa-play me-1"></i> Start / Update Live Over
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- On-Crease Live Status (Striker, Non-Striker, Bowler Stats) -->
+                {% if match.striker or match.current_bowler %}
+                <div class="row g-3 mb-4">
+                    <!-- Batsmen Card -->
+                    <div class="col-md-7">
+                        <div class="p-3.5 rounded-4 border bg-light h-100">
+                            <h6 class="fw-bold text-navy mb-3"><i class="fa-solid fa-baseball-bat-ball text-primary me-2"></i>Batsmen on Crease</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0 text-center">
+                                    <thead>
+                                        <tr class="text-muted extra-small">
+                                            <th class="text-start">Batsman</th>
+                                            <th>R</th>
+                                            <th>B</th>
+                                            <th>4s</th>
+                                            <th>6s</th>
+                                            <th>SR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if match.striker %}
+                                        <tr class="table-primary border-primary">
+                                            <td class="text-start fw-bold text-navy">
+                                                <i class="fa-solid fa-angles-right text-danger me-1"></i> {{ match.striker.full_name }} * <span class="badge bg-danger extra-small">Striker</span>
+                                            </td>
+                                            <td class="fw-bold fs-6">{{ striker_perf.runs|default:0 }}</td>
+                                            <td>{{ striker_perf.balls_faced|default:0 }}</td>
+                                            <td>{{ striker_perf.fours|default:0 }}</td>
+                                            <td>{{ striker_perf.sixes|default:0 }}</td>
+                                            <td class="fw-bold text-primary">{{ striker_perf.strike_rate|default:"0.0" }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if match.non_striker %}
+                                        <tr>
+                                            <td class="text-start fw-semibold text-navy">
+                                                {{ match.non_striker.full_name }} <span class="badge bg-secondary extra-small">Non-Striker</span>
+                                            </td>
+                                            <td class="fw-bold fs-6">{{ non_striker_perf.runs|default:0 }}</td>
+                                            <td>{{ non_striker_perf.balls_faced|default:0 }}</td>
+                                            <td>{{ non_striker_perf.fours|default:0 }}</td>
+                                            <td>{{ non_striker_perf.sixes|default:0 }}</td>
+                                            <td class="fw-bold text-muted">{{ non_striker_perf.strike_rate|default:"0.0" }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bowler Card -->
+                    <div class="col-md-5">
+                        <div class="p-3.5 rounded-4 border bg-light h-100">
+                            <h6 class="fw-bold text-navy mb-3"><i class="fa-solid fa-bowling-ball text-danger me-2"></i>Current Bowler</h6>
+                            {% if match.current_bowler %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h6 class="fw-bold text-navy mb-0">{{ match.current_bowler.full_name }}</h6>
+                                        <small class="text-muted">{{ match.current_bowler.get_bowling_style_display }}</small>
+                                    </div>
+                                    <span class="badge bg-navy text-white px-3 py-1.5 rounded-pill">Bowler</span>
+                                </div>
+                                <div class="row g-2 text-center small mt-2">
+                                    <div class="col-3 p-2 bg-white rounded-3 border">
+                                        <small class="text-muted d-block">Overs</small>
+                                        <strong class="fs-6 text-navy">{{ bowler_perf.overs_bowled|default:0.0 }}</strong>
+                                    </div>
+                                    <div class="col-3 p-2 bg-white rounded-3 border">
+                                        <small class="text-muted d-block">Runs</small>
+                                        <strong class="fs-6 text-danger">{{ bowler_perf.runs_conceded|default:0 }}</strong>
+                                    </div>
+                                    <div class="col-3 p-2 bg-white rounded-3 border">
+                                        <small class="text-muted d-block">Wkts</small>
+                                        <strong class="fs-6 text-success">{{ bowler_perf.wickets|default:0 }}</strong>
+                                    </div>
+                                    <div class="col-3 p-2 bg-white rounded-3 border">
+                                        <small class="text-muted d-block">Econ</small>
+                                        <strong class="fs-6 text-muted">{{ bowler_perf.economy_rate|default:"0.0" }}</strong>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="text-muted small">No bowler selected for this over.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1-Click Real-time Scoring Buttons (0, 1, 2, 3, 4, 6, W, WD, NB) -->
+                <div class="p-4 rounded-4 bg-light border text-center">
+                    <h6 class="fw-bold text-navy mb-3">
+                        <i class="fa-solid fa-hand-pointer text-warning me-2"></i>1-Click Real-time Score Update:
+                    </h6>
+                    <form method="post" action="{% url 'match_record_ball' match.id %}" class="d-flex justify-content-center gap-2 flex-wrap">
+                        {% csrf_token %}
+                        <button type="submit" name="ball_action" value="0" class="btn btn-outline-dark rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">0</button>
+                        <button type="submit" name="ball_action" value="1" class="btn btn-outline-primary rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">1</button>
+                        <button type="submit" name="ball_action" value="2" class="btn btn-outline-primary rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">2</button>
+                        <button type="submit" name="ball_action" value="3" class="btn btn-outline-primary rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">3</button>
+                        <button type="submit" name="ball_action" value="4" class="btn btn-primary rounded-circle fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">4</button>
+                        <button type="submit" name="ball_action" value="6" class="btn btn-success rounded-circle fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">6</button>
+                        <button type="submit" name="ball_action" value="W" class="btn btn-danger rounded-circle fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">W</button>
+                        <button type="submit" name="ball_action" value="WD" class="btn btn-warning rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 0.9rem;">Wd</button>
+                        <button type="submit" name="ball_action" value="NB" class="btn btn-warning rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 0.9rem;">Nb</button>
+                    </form>
+                    <small class="text-muted d-block mt-2">
+                        Clicking 1 or 3 runs automatically rotates strike! 4s and 6s update strike rate immediately.
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 2. Match Result & Winner Entry Form -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+            <div class="bg-navy p-4 text-white">
+                <h5 class="fw-bold mb-1"><i class="fa-solid fa-trophy text-warning me-2"></i>Match Result & Winner Announcement</h5>
+                <p class="small text-slate-300 mb-0">Publish final results and announce Man of the Match</p>
             </div>
             <div class="card-body p-4 p-md-5">
                 <form method="post">
                     {% csrf_token %}
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Match Status</label>
-                        {{ form.status }}
-                    </div>
-
-                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-coin text-warning me-2"></i>Toss Details</h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Toss Winner</label>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-navy">Match Status</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-navy">Toss Winner</label>
                             {{ form.toss_winner }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Toss Decision</label>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-navy">Toss Decision</label>
                             {{ form.toss_decision }}
                         </div>
                     </div>
 
-                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-ol text-purple me-2"></i>Team Scores & Overs</h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ match.team_a.name }} Score</label>
+                            <label class="form-label fw-bold text-navy">{{ match.team_a.name }} Final Score</label>
                             {{ form.team_a_score }}
                             <small class="text-muted">e.g. 185/4 (20.0 ov)</small>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ match.team_b.name }} Score</label>
+                            <label class="form-label fw-bold text-navy">{{ match.team_b.name }} Final Score</label>
                             {{ form.team_b_score }}
                             <small class="text-muted">e.g. 170/8 (20.0 ov)</small>
                         </div>
                     </div>
 
-                    <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i>Result & Award</h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Match Winner</label>
+                            <label class="form-label fw-bold text-navy">Match Winner</label>
                             {{ form.winner }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Win Margin</label>
+                            <label class="form-label fw-bold text-navy">Win Margin</label>
                             {{ form.win_margin }}
                             <small class="text-muted">e.g. Won by 15 runs / 4 wickets</small>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-bold">Man of the Match</label>
+                            <label class="form-label fw-bold text-navy">Man of the Match</label>
                             {{ form.man_of_the_match }}
                         </div>
                     </div>
@@ -65,26 +299,28 @@
                     <div class="p-3 bg-light rounded-3 mb-4 border d-flex align-items-center">
                         <div class="form-check me-3">
                             {{ form.is_result_published }}
-                            <label class="form-check-label fw-bold text-dark ms-2" for="id_is_result_published">
-                                Publish Result & Send Notifications
+                            <label class="form-check-label fw-bold text-navy ms-2" for="id_is_result_published">
+                                Publish Result & Send Notifications to All Teams & Players
                             </label>
                         </div>
-                        <small class="text-muted">Checking this box will automatically notify all registered players and teams!</small>
                     </div>
 
-                    <button type="submit" class="btn btn-purple w-100 py-3 rounded-pill shadow">
-                        <i class="fa-solid fa-check-circle me-2"></i> Save Match Score & Result
-                    </button>
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{% url 'match_detail' match.id %}" class="btn btn-outline-secondary rounded-pill px-4">View Match Page</a>
+                        <button type="submit" class="btn btn-emerald px-5 py-2.5 rounded-pill shadow fw-bold">
+                            <i class="fa-solid fa-check-circle me-2"></i> Save Match Score & Result
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
 
         <!-- Recorded Player Match Performances Table -->
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-            <div class="card-header bg-white p-3 d-flex justify-content-between align-items-center border-bottom">
-                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-users text-purple me-2"></i>Individual Player Performances</h5>
-                <a href="{% url 'add_player_performance' match.id %}" class="btn btn-sm btn-purple rounded-pill">
-                    <i class="fa-solid fa-plus me-1"></i> Add Player Performance
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+            <div class="card-header bg-white p-3.5 d-flex justify-content-between align-items-center border-bottom">
+                <h5 class="fw-bold text-navy mb-0"><i class="fa-solid fa-users text-primary me-2"></i>Full Match Player Performances & Career Stats</h5>
+                <a href="{% url 'add_player_performance' match.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                    <i class="fa-solid fa-plus me-1"></i> Add Custom Player Performance
                 </a>
             </div>
             <div class="table-responsive">
@@ -93,11 +329,43 @@
                         <tr>
                             <th class="text-start">Player Name</th>
                             <th>Team</th>
+                            <th>Batting Status</th>
                             <th>Runs (Balls)</th>
-                            <th>Wkts / Overs</th>
-                            <th>Catches</th>
+                            <th>4s / 6s</th>
+                            <th>SR</th>
+                            <th>Overs</th>
+                            <th>Runs Conc.</th>
+                            <th>Wkts</th>
+                            <th>Econ</th>
                         </tr>
                     </thead>
+                    <tbody>
+                        {% for p in performances %}
+                            <tr>
+                                <td class="text-start fw-bold text-navy">{{ p.player.full_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ p.team.short_code }}</span></td>
+                                <td><span class="badge bg-secondary">{{ p.get_batting_status_display }}</span></td>
+                                <td class="fw-bold text-navy">{{ p.runs }} <span class="text-muted fw-normal">({{ p.balls_faced }})</span></td>
+                                <td>{{ p.fours }} / {{ p.sixes }}</td>
+                                <td class="fw-bold text-primary">{{ p.strike_rate }}</td>
+                                <td>{{ p.overs_bowled }}</td>
+                                <td>{{ p.runs_conceded }}</td>
+                                <td class="fw-bold text-danger">{{ p.wickets }}</td>
+                                <td>{{ p.economy_rate }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-4 text-muted">No individual player performances recorded yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
                     <tbody>
                         {% for p in performances %}
                             <tr>

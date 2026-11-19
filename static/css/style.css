@@ -306,10 +306,26 @@ footer a:hover {
     border-color: #10B981 !important;
 }
 .bg-navy {
-    background-color: #ffffff !important;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%) !important;
+    color: #ffffff !important;
+}
+.bg-navy * {
+    color: inherit;
+}
+.bg-navy .text-white {
+    color: #ffffff !important;
+}
+.bg-navy .text-slate-300 {
+    color: #cbd5e1 !important;
+}
+.bg-navy .text-slate-200 {
+    color: #e2e8f0 !important;
+}
+.bg-navy .text-white-50 {
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 .text-navy {
-    color: #111827 !important;
+    color: #0f172a !important;
 }
 
 /* Strict Text Contrast Rules for White / Light Backgrounds */

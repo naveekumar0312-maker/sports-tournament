@@ -28,6 +28,17 @@ class Match(models.Model):
     
     team_a_score = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. 185/4 (20.0 ov)")
     team_b_score = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. 170/8 (20.0 ov)")
+
+    # Realtime Live Scoring State
+    current_batting_team = models.ForeignKey('teams.Team', on_delete=models.SET_NULL, null=True, blank=True, related_name='current_batting_matches')
+    striker = models.ForeignKey('players.PlayerProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='striker_matches')
+    non_striker = models.ForeignKey('players.PlayerProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='non_striker_matches')
+    current_bowler = models.ForeignKey('players.PlayerProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='bowling_matches')
+    
+    current_runs = models.PositiveIntegerField(default=0)
+    current_wickets = models.PositiveIntegerField(default=0)
+    current_overs = models.DecimalField(max_digits=4, decimal_places=1, default=0.0)
+    recent_balls = models.CharField(max_length=200, blank=True, default='', help_text="e.g. 1, 0, 4, 6, W, 2")
     
     winner = models.ForeignKey('teams.Team', on_delete=models.SET_NULL, null=True, blank=True, related_name='match_wins')
     win_margin = models.CharField(max_length=100, blank=True, null=True, help_text="e.g. Won by 15 runs")
