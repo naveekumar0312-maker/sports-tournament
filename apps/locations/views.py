@@ -1,12 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import District, Taluk, Village
 
 def district_list_view(request):
-    districts = District.objects.all().prefetch_related('taluks', 'tournaments', 'teams')
-    return render(request, 'locations/district_list.html', {
-        'districts': districts
-    })
+    return redirect('tournament_list')
 
 def taluks_api_view(request):
     district_id = request.GET.get('district_id')

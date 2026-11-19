@@ -85,10 +85,10 @@
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card d-flex align-items-center">
-            <div class="stat-icon stat-icon-rose me-3"><i class="fa-solid fa-map-location-dot"></i></div>
+            <div class="stat-icon stat-icon-rose me-3"><i class="fa-solid fa-trophy"></i></div>
             <div>
-                <div class="stat-number">{{ total_districts }}</div>
-                <div class="text-muted small fw-semibold">TN Districts</div>
+                <div class="stat-number">{{ total_tournaments|default:"1" }}</div>
+                <div class="text-muted small fw-semibold">Tournaments</div>
             </div>
         </div>
     </div>
@@ -97,8 +97,8 @@
 <!-- Featured Tournaments -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="fw-bold mb-0 text-navy"><i class="fa-solid fa-star text-warning me-2"></i>Active Tamil Nadu Tournaments</h3>
-        <p class="text-muted small mb-0">Browse ongoing, upcoming, and open registration cricket tournaments in your district.</p>
+        <h3 class="fw-bold mb-0 text-navy"><i class="fa-solid fa-star text-warning me-2"></i>Naveen Cricket Org Tournaments</h3>
+        <p class="text-muted small mb-0">Browse ongoing, upcoming, and open registration cricket championships.</p>
     </div>
     <a href="{% url 'tournament_list' %}" class="btn btn-outline-dark btn-sm rounded-pill fw-bold">View All <i class="fa-solid fa-arrow-right ms-1"></i></a>
 </div>
@@ -179,20 +179,19 @@
         {% endfor %}
     </div>
 
-    <!-- Tamil Nadu Districts Quick Explorer -->
+    <!-- Organization Quick Links -->
     <div class="col-lg-6">
-        <h4 class="fw-bold mb-3 text-navy"><i class="fa-solid fa-map-location-dot text-primary me-2"></i>Tamil Nadu Districts Network</h4>
+        <h4 class="fw-bold mb-3 text-navy"><i class="fa-solid fa-users-gear text-primary me-2"></i>Organization Squads & Players</h4>
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
-            <p class="text-muted small">Our application covers all 38 districts of Tamil Nadu, enabling seamless local taluk-level tournament organizing, scouting, and match tracking.</p>
-            <div class="row g-2 mb-3">
-                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Chennai</span></div>
-                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Coimbatore</span></div>
-                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Madurai</span></div>
-                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Trichy</span></div>
-                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Salem</span></div>
-                <div class="col-6 col-sm-4"><span class="badge bg-light text-dark border w-100 p-2"><i class="fa-solid fa-location-dot text-danger me-1"></i> Tirunelveli</span></div>
+            <p class="text-muted small">Naveen Cricket Tournament Organization brings together registered village teams, cricket clubs, and talented players for competitive championship tournaments.</p>
+            <div class="d-flex flex-column gap-2 mb-3">
+                <a href="{% url 'team_list' %}" class="btn btn-outline-purple w-100 rounded-pill fw-bold">
+                    <i class="fa-solid fa-people-group me-1"></i> Browse Registered Teams
+                </a>
+                <a href="{% url 'player_list' %}" class="btn btn-outline-dark w-100 rounded-pill fw-bold">
+                    <i class="fa-solid fa-user-ninja me-1"></i> Browse Players Directory
+                </a>
             </div>
-            <a href="{% url 'district_list' %}" class="btn btn-outline-emerald w-100 rounded-pill fw-bold">Explore All 38 Tamil Nadu Districts</a>
         </div>
     </div>
 </div>
