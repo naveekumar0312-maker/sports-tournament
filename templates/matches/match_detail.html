@@ -32,7 +32,78 @@
                 <h5 class="fw-bold mb-0 text-white"><i class="fa-solid fa-trophy text-warning me-2"></i>Winner: {{ match.winner.name }}</h5>
                 <small>{{ match.win_margin|default:"" }}</small>
             </div>
+        {% elif match.status == 'LIVE' %}
+            <div class="p-2 bg-danger rounded-pill d-inline-block px-4 shadow animate-pulse">
+                <span class="fw-bold text-white"><i class="fa-solid fa-circle-dot me-1"></i> LIVE MATCH IN PROGRESS</span>
+            </div>
         {% endif %}
+    </div>
+</div>
+
+<!-- Player Performances Scorecard Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
+    <div class="card-header bg-white p-3.5 d-flex justify-content-between align-items-center border-bottom">
+        <div>
+            <h5 class="fw-bold text-navy mb-0"><i class="fa-solid fa-clipboard-list text-primary me-2"></i>Match Scorecard & Individual Player Stats</h5>
+            <small class="text-muted">Live stats updated by Naveen Cricket Org Super Admin</small>
+        </div>
+        {% if user == match.tournament.organizer or user.is_admin_role %}
+            <div class="d-flex gap-2">
+                <a href="{% url 'add_player_performance' match.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                    <i class="fa-solid fa-user-plus me-1"></i> Add Player Stat
+                </a>
+                <a href="{% url 'match_update_score' match.id %}" class="btn btn-sm btn-emerald rounded-pill">
+                    <i class="fa-solid fa-pen-to-square me-1"></i> Update Scorecard
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center small">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-start">Player</th>
+                    <th>Team</th>
+                    <th>Batting</th>
+                    <th>Runs (Balls)</th>
+                    <th>SR</th>
+                    <th>4s / 6s</th>
+                    <th>Overs</th>
+                    <th>Runs Conc.</th>
+                    <th>Wickets</th>
+                    <th>Econ</th>
+                    <th>Catches/RO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in performances %}
+                    <tr>
+                        <td class="text-start fw-bold">
+                            <a href="{% url 'player_detail' p.player.id %}" class="text-navy text-decoration-none">
+                                {{ p.player.full_name }}
+                            </a>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">{{ p.team.short_code }}</span></td>
+                        <td><span class="badge bg-secondary">{{ p.get_batting_status_display }}</span></td>
+                        <td class="fw-bold text-navy">{{ p.runs }} <span class="text-muted fw-normal">({{ p.balls_faced }})</span></td>
+                        <td class="text-muted">{{ p.strike_rate }}</td>
+                        <td>{{ p.fours }} / {{ p.sixes }}</td>
+                        <td>{{ p.overs_bowled }}</td>
+                        <td>{{ p.runs_conceded }}</td>
+                        <td class="fw-bold text-danger">{{ p.wickets }}</td>
+                        <td class="text-muted">{{ p.economy_rate }}</td>
+                        <td>{{ p.catches }} / {{ p.run_outs }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="11" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-clipboard-question fs-3 d-block mb-2 text-slate-300"></i>
+                            No player match stats recorded yet for this match.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 

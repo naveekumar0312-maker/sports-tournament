@@ -36,6 +36,10 @@ class Tournament(models.Model):
     registration_start_date = models.DateField()
     registration_end_date = models.DateField()
     
+    prize_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Total Tournament Prize Pool (Rs)")
+    rules_and_regulations = models.TextField(blank=True, null=True, help_text="Tournament rules and guidelines")
+    exact_location = models.CharField(max_length=255, blank=True, null=True, help_text="Exact ground/stadium location or map address")
+
     entry_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     organizer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='organized_tournaments')
     contact_phone = models.CharField(max_length=15)

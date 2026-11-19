@@ -47,13 +47,70 @@
     </form>
 </div>
 
+<!-- Visual Tournament Roadmap -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+        <h5 class="fw-bold text-navy mb-0">
+            <i class="fa-solid fa-route text-primary me-2"></i>Official Tournament Roadmap
+        </h5>
+        <span class="badge bg-navy text-white px-3 py-2 rounded-pill"><i class="fa-solid fa-shield-halved me-1"></i> Naveen Cricket Org Process</span>
+    </div>
+    <div class="row g-3 text-center">
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="p-3 rounded-4 bg-light h-100 border border-primary border-opacity-25 shadow-xs position-relative">
+                <div class="badge bg-primary text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">1</div>
+                <div class="fs-4 text-primary mb-1"><i class="fa-solid fa-file-signature"></i></div>
+                <h6 class="fw-bold text-navy mb-1 small">Registration</h6>
+                <p class="text-muted extra-small mb-0">Captains register team & squad</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="p-3 rounded-4 bg-light h-100 border border-info border-opacity-25 shadow-xs position-relative">
+                <div class="badge bg-info text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">2</div>
+                <div class="fs-4 text-info mb-1"><i class="fa-solid fa-calendar-check"></i></div>
+                <h6 class="fw-bold text-navy mb-1 small">Fixtures Draw</h6>
+                <p class="text-muted extra-small mb-0">Super Admin schedules matches</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="p-3 rounded-4 bg-light h-100 border border-warning border-opacity-25 shadow-xs position-relative">
+                <div class="badge bg-warning text-dark rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">3</div>
+                <div class="fs-4 text-warning mb-1"><i class="fa-solid fa-baseball-bat-ball"></i></div>
+                <h6 class="fw-bold text-navy mb-1 small">League / Knockout</h6>
+                <p class="text-muted extra-small mb-0">Live scorecard & real-time stats</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="p-3 rounded-4 bg-light h-100 border border-danger border-opacity-25 shadow-xs position-relative">
+                <div class="badge bg-danger text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">4</div>
+                <div class="fs-4 text-danger mb-1"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                <h6 class="fw-bold text-navy mb-1 small">Semi & Finals</h6>
+                <p class="text-muted extra-small mb-0">Top teams battle for championship</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-2-4 col-lg">
+            <div class="p-3 rounded-4 bg-light h-100 border border-success border-opacity-25 shadow-xs position-relative">
+                <div class="badge bg-success text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">5</div>
+                <div class="fs-4 text-success mb-1"><i class="fa-solid fa-trophy"></i></div>
+                <h6 class="fw-bold text-navy mb-1 small">Trophy & Prize</h6>
+                <p class="text-muted extra-small mb-0">Cash prize & player career honours</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Tournaments Grid -->
 <div class="row g-4">
     {% for t in tournaments %}
         <div class="col-md-6 col-lg-4">
             <div class="tournament-card h-100 d-flex flex-column bg-white shadow-sm border rounded-4 overflow-hidden">
-                <div class="tournament-banner-placeholder bg-light text-center p-4 border-bottom">
+                <div class="tournament-banner-placeholder bg-light text-center p-4 border-bottom position-relative">
                     <i class="fa-solid fa-trophy fs-1 text-warning opacity-75"></i>
+                    {% if t.prize_amount > 0 %}
+                    <span class="position-absolute top-0 end-0 m-3 badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold shadow-sm">
+                        <i class="fa-solid fa-award me-1"></i> Prize: ₹{{ t.prize_amount|floatformat:0 }}
+                    </span>
+                    {% endif %}
                 </div>
                 <div class="p-4 d-flex flex-column flex-grow-1">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -72,6 +129,10 @@
                     <p class="text-muted small line-clamp-2 mb-3">{{ t.description|truncatewords:15 }}</p>
 
                     <div class="bg-light p-2.5 rounded-3 mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted"><i class="fa-solid fa-award text-warning me-1"></i>Cash Prize Pool:</span>
+                            <span class="fw-bold text-navy">₹{{ t.prize_amount|floatformat:0 }}</span>
+                        </div>
                         <div class="d-flex justify-content-between mb-1">
                             <span class="text-muted"><i class="fa-solid fa-baseball-bat-ball me-1"></i>Format:</span>
                             <span class="fw-bold text-navy">{{ t.get_tournament_type_display }}</span>

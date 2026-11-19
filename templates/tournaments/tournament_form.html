@@ -39,13 +39,29 @@
                         </div>
                     </div>
 
-                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-location-dot text-danger me-2"></i>Tournament Venue</h5>
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-location-dot text-danger me-2"></i>Tournament Venue & Exact Location</h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold text-navy">Venue / Ground Name & City *</label>
                             {{ form.venue }}
                             {% if form.venue.errors %}<div class="text-danger small">{{ form.venue.errors }}</div>{% endif %}
-                            <small class="text-muted">e.g. Naveen Sports Ground, Pollachi Road, Coimbatore</small>
+                            <small class="text-muted">e.g. Naveen Stadium, Coimbatore</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-navy">Exact Location / Address *</label>
+                            {{ form.exact_location }}
+                            {% if form.exact_location.errors %}<div class="text-danger small">{{ form.exact_location.errors }}</div>{% endif %}
+                            <small class="text-muted">e.g. Near Gandhi Statue, Pollachi Main Road, Coimbatore - 641021</small>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-scale-balanced text-primary me-2"></i>Rules & Regulations</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-navy">Tournament Rules & Guidelines</label>
+                            {{ form.rules_and_regulations }}
+                            {% if form.rules_and_regulations.errors %}<div class="text-danger small">{{ form.rules_and_regulations.errors }}</div>{% endif %}
+                            <small class="text-muted">Specify match overs, dress code, umpire decisions, boundary rules, super over rules, etc.</small>
                         </div>
                     </div>
 
@@ -69,21 +85,27 @@
                         </div>
                     </div>
 
-                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-wallet text-emerald me-2"></i>Fees, Contact & Status</h5>
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i>Prizes, Entry Fees, Contact & Status</h5>
                     <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Prize Amount (₹) *</label>
+                            {{ form.prize_amount }}
+                            {% if form.prize_amount.errors %}<div class="text-danger small">{{ form.prize_amount.errors }}</div>{% endif %}
+                            <small class="text-muted">Total Cash Prize Pool</small>
+                        </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold text-navy">Entry Fee (₹)</label>
                             {{ form.entry_fee }}
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-bold text-navy">Max Teams</label>
+                            <label class="form-label fw-bold text-navy">Max Teams Allowed</label>
                             {{ form.max_teams }}
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold text-navy">Contact Phone *</label>
                             {{ form.contact_phone }}
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold text-navy">Contact Email *</label>
                             {{ form.contact_email }}
                         </div>

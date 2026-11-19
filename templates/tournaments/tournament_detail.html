@@ -17,9 +17,15 @@
         </div>
 
         <h1 class="fw-bold display-6 mb-2">{{ tournament.name }}</h1>
-        <p class="text-slate-300 fs-5 mb-3"><i class="fa-solid fa-map-pin me-2 text-warning"></i>{{ tournament.venue }}</p>
+        <p class="text-slate-300 fs-5 mb-3">
+            <i class="fa-solid fa-map-pin me-2 text-warning"></i>{{ tournament.venue }}
+            {% if tournament.exact_location %}
+                <span class="fs-6 text-white-50 ms-2">({{ tournament.exact_location }})</span>
+            {% endif %}
+        </p>
 
         <div class="d-flex flex-wrap gap-4 text-slate-200 small">
+            <div><i class="fa-solid fa-award me-1 text-warning"></i> <strong>Prize Pool:</strong> ₹{{ tournament.prize_amount|floatformat:0 }}</div>
             <div><i class="fa-solid fa-calendar me-1 text-emerald"></i> <strong>Start:</strong> {{ tournament.start_date|date:"d M, Y" }}</div>
             <div><i class="fa-solid fa-calendar-check me-1 text-emerald"></i> <strong>End:</strong> {{ tournament.end_date|date:"d M, Y" }}</div>
             <div><i class="fa-solid fa-indian-rupee-sign me-1 text-warning"></i> <strong>Entry Fee:</strong> ₹{{ tournament.entry_fee|floatformat:0 }}</div>
@@ -65,15 +71,80 @@
     
     <!-- 1. Overview Tab -->
     <div class="tab-pane fade show active" id="overview">
+        <!-- Visual Tournament Roadmap -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                <h5 class="fw-bold text-navy mb-0">
+                    <i class="fa-solid fa-route text-primary me-2"></i>Tournament Progression Roadmap
+                </h5>
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold"><i class="fa-solid fa-award me-1"></i> Total Prize: ₹{{ tournament.prize_amount|floatformat:0 }}</span>
+            </div>
+            <div class="row g-3 text-center">
+                <div class="col-6 col-md-2-4 col-lg">
+                    <div class="p-3 rounded-4 bg-light h-100 border border-primary border-opacity-25 shadow-xs">
+                        <div class="badge bg-primary text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">1</div>
+                        <div class="fs-4 text-primary mb-1"><i class="fa-solid fa-file-signature"></i></div>
+                        <h6 class="fw-bold text-navy mb-1 small">Registration</h6>
+                        <p class="text-muted extra-small mb-0">{{ tournament.registered_teams_count }}/{{ tournament.max_teams }} Teams Joined</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2-4 col-lg">
+                    <div class="p-3 rounded-4 bg-light h-100 border border-info border-opacity-25 shadow-xs">
+                        <div class="badge bg-info text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">2</div>
+                        <div class="fs-4 text-info mb-1"><i class="fa-solid fa-calendar-check"></i></div>
+                        <h6 class="fw-bold text-navy mb-1 small">Fixtures Draw</h6>
+                        <p class="text-muted extra-small mb-0">{{ matches.count }} Fixtures Set</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2-4 col-lg">
+                    <div class="p-3 rounded-4 bg-light h-100 border border-warning border-opacity-25 shadow-xs">
+                        <div class="badge bg-warning text-dark rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">3</div>
+                        <div class="fs-4 text-warning mb-1"><i class="fa-solid fa-baseball-bat-ball"></i></div>
+                        <h6 class="fw-bold text-navy mb-1 small">League / Knockout</h6>
+                        <p class="text-muted extra-small mb-0">Live Match Scoreboard</p>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2-4 col-lg">
+                    <div class="p-3 rounded-4 bg-light h-100 border border-danger border-opacity-25 shadow-xs">
+                        <div class="badge bg-danger text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">4</div>
+                        <div class="fs-4 text-danger mb-1"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                        <h6 class="fw-bold text-navy mb-1 small">Semi & Finals</h6>
+                        <p class="text-muted extra-small mb-0">Championship Decider</p>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2-4 col-lg">
+                    <div class="p-3 rounded-4 bg-light h-100 border border-success border-opacity-25 shadow-xs">
+                        <div class="badge bg-success text-white rounded-circle p-2 mb-2" style="width: 32px; height: 32px; line-height: 16px;">5</div>
+                        <div class="fs-4 text-success mb-1"><i class="fa-solid fa-trophy"></i></div>
+                        <h6 class="fw-bold text-navy mb-1 small">Trophy & Prize</h6>
+                        <p class="text-muted extra-small mb-0">₹{{ tournament.prize_amount|floatformat:0 }} Cash Award</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                    <h5 class="fw-bold text-navy mb-3">About the Tournament</h5>
-                    <p class="text-muted leading-relaxed">{{ tournament.description|linebreaks }}</p>
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-circle-info text-primary me-2"></i>About the Tournament</h5>
+                    <p class="text-muted leading-relaxed mb-4">{{ tournament.description|linebreaks }}</p>
+
+                    {% if tournament.rules_and_regulations %}
+                        <h5 class="fw-bold text-navy mb-3 border-top pt-3"><i class="fa-solid fa-scale-balanced text-primary me-2"></i>Rules & Regulations</h5>
+                        <div class="p-3 bg-light rounded-3 text-muted small leading-relaxed">
+                            {{ tournament.rules_and_regulations|linebreaks }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             
             <div class="col-lg-4">
+                <!-- Location & Ground Box -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-location-dot text-danger me-2"></i>Exact Ground Location</h5>
+                    <p class="fw-bold mb-1 text-navy">{{ tournament.venue }}</p>
+                    <p class="small text-muted mb-0"><i class="fa-solid fa-map-location-dot me-2 text-danger"></i>{{ tournament.exact_location|default:"Venue ground address specified by organizer" }}</p>
+                </div>
                 <!-- Registration Box -->
                 <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
                     <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-ticket text-emerald me-2"></i>Team Registration</h5>
