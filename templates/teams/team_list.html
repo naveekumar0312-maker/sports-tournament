@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Cricket Teams | Sports Tournament{% endblock %}
+{% block title %}Teams Directory | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold text-navy mb-1"><i class="fa-solid fa-people-group text-primary me-2"></i>Registered Cricket Clubs & Teams</h2>
-        <p class="text-muted small mb-0">Browse team rosters, captains, and club information across Tamil Nadu.</p>
+        <h2 class="fw-bold text-navy mb-1"><i class="fa-solid fa-people-group text-primary me-2"></i>Naveen Cricket Org - Registered Teams</h2>
+        <p class="text-muted small mb-0">Browse village & club cricket teams. Players can send join requests to team captains.</p>
     </div>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and user.is_captain_role %}
         <a href="{% url 'team_create' %}" class="btn btn-emerald rounded-pill px-4 shadow">
             <i class="fa-solid fa-plus-circle me-1"></i> Register New Team
         </a>
@@ -20,29 +20,60 @@
         <div class="col-md-6 col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white d-flex flex-column">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="me-3 p-3 bg-light rounded-circle text-emerald">
-                        <i class="fa-solid fa-shield-halved fs-1"></i>
-                    </div>
+                    {% if team.logo %}
+                        <img src="{{ team.logo.url }}" class="rounded-circle shadow me-3" style="width: 55px; height: 55px; object-fit: cover;" alt="">
+                    {% else %}
+                        <div class="me-3 p-3 bg-light rounded-circle text-emerald">
+                            <i class="fa-solid fa-shield-halved fs-2"></i>
+                        </div>
+                    {% endif %}
                     <div>
                         <h5 class="fw-bold text-navy mb-0">{{ team.name }}</h5>
                         <span class="badge bg-dark">{{ team.short_code }}</span>
-                        <span class="badge bg-light text-dark border ms-1"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ team.district.name }}</span>
+                        <span class="badge bg-light text-dark border ms-1"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ team.district.name|default:"Tamil Nadu" }}</span>
                     </div>
                 </div>
 
                 <div class="bg-light p-3 rounded-3 mb-3 small">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="text-muted">Captain:</span>
-                        <span class="fw-bold">{{ team.captain.full_name|default:"TBD" }}</span>
+                        <span class="fw-bold">{{ team.captain.full_name|default:team.created_by.username }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span class="text-muted">Total Players:</span>
-                        <span class="fw-bold text-success">{{ team.total_players }} Members</span>
+                        <span class="text-muted">Squad Size:</span>
+                        <span class="fw-bold text-success">{{ team.total_players }} Players</span>
                     </div>
                 </div>
 
-                <div class="mt-auto">
-                    <a href="{% url 'team_detail' team.id %}" class="btn btn-outline-dark w-100 rounded-pill">View Roster & History</a>
+                <div class="mt-auto d-flex flex-column gap-2">
+                    <a href="{% url 'team_detail' team.id %}" class="btn btn-outline-dark w-100 rounded-pill btn-sm">
+                        <i class="fa-solid fa-eye me-1"></i> View Roster & Matches
+                    </a>
+
+                    {% if user.is_authenticated and player_profile %}
+                        {% if player_profile.current_team == team %}
+                            <span class="badge bg-success-subtle text-success border border-success py-2 rounded-pill text-center">
+                                <i class="fa-solid fa-check me-1"></i> Your Team
+                            </span>
+                        {% elif team.id in pending_team_ids %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning py-2 rounded-pill text-center">
+                                <i class="fa-regular fa-clock me-1"></i> Request Pending
+                            </span>
+                        {% else %}
+                            <button type="button" class="btn btn-emerald btn-sm rounded-pill w-100" data-bs-toggle="collapse" data-bs-target="#quickJoin-{{ team.id }}">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Request to Join
+                            </button>
+                            <div class="collapse mt-1" id="quickJoin-{{ team.id }}">
+                                <form method="post" action="{% url 'send_join_request' team.id %}">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="message" class="form-control" placeholder="Short note (e.g. Batsman)" required>
+                                        <button class="btn btn-emerald" type="submit">Send</button>
+                                    </div>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>

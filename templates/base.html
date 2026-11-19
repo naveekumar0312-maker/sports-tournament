@@ -19,8 +19,8 @@
         <!-- Desktop Left Sidebar -->
         <aside class="app-sidebar d-none d-lg-flex">
             <a href="{% url 'home' %}" class="sidebar-brand">
-                <i class="fa-solid fa-trophy"></i>
-                <span>Sports<span class="text-secondary fw-normal">Tourney</span></span>
+                <i class="fa-solid fa-trophy text-warning"></i>
+                <span class="fw-bold">Naveen<span class="text-warning fw-semibold"> Cricket Org</span></span>
             </a>
 
             <ul class="sidebar-menu">
@@ -31,21 +31,21 @@
                 </li>
 
                 {% if user.is_authenticated %}
-                    {% if user.is_organizer_role %}
-                        <div class="sidebar-section-title">Organizer Workspace</div>
+                    {% if user.is_admin_role %}
+                        <div class="sidebar-section-title">Super Admin Workspace</div>
                         <li class="sidebar-item">
-                            <a href="{% url 'organizer_dashboard' %}" class="sidebar-link {% if 'organizer' in request.path %}active{% endif %}">
-                                <i class="fa-solid fa-gauge-high"></i> Dashboard
+                            <a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if 'dashboard/admin' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-gauge-high text-danger"></i> Admin Dashboard
                             </a>
                         </li>
                         <li class="sidebar-item">
                             <a href="{% url 'tournament_list' %}" class="sidebar-link {% if 'tournaments' in request.path %}active{% endif %}">
-                                <i class="fa-solid fa-trophy"></i> My Tournaments
+                                <i class="fa-solid fa-trophy text-warning"></i> Tournaments & Fixtures
                             </a>
                         </li>
                         <li class="sidebar-item">
                             <a href="{% url 'team_list' %}" class="sidebar-link {% if 'teams' in request.path %}active{% endif %}">
-                                <i class="fa-solid fa-people-group"></i> Teams
+                                <i class="fa-solid fa-people-group"></i> Registered Teams
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -53,21 +53,43 @@
                                 <i class="fa-solid fa-user-ninja"></i> Players Directory
                             </a>
                         </li>
+                    {% elif user.is_captain_role %}
+                        <div class="sidebar-section-title">Captain Workspace</div>
+                        <li class="sidebar-item">
+                            <a href="{% url 'captain_dashboard' %}" class="sidebar-link {% if 'captain' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-gauge-high text-warning"></i> Captain Dashboard
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'tournament_list' %}" class="sidebar-link {% if 'tournaments' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-trophy"></i> Upcoming Tournaments
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'team_list' %}" class="sidebar-link {% if 'teams' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-people-group"></i> My Team & Opponents
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'player_list' %}" class="sidebar-link {% if 'players' in request.path and 'edit' not in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-binoculars"></i> Scout Players
+                            </a>
+                        </li>
                     {% else %}
                         <div class="sidebar-section-title">Player Workspace</div>
                         <li class="sidebar-item">
                             <a href="{% url 'player_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'player_dashboard' %}active{% endif %}">
-                                <i class="fa-solid fa-gauge-high"></i> Dashboard
+                                <i class="fa-solid fa-gauge-high text-emerald"></i> Player Dashboard
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{% url 'team_list' %}" class="sidebar-link {% if 'teams' in request.path %}active{% endif %}">
+                                <i class="fa-solid fa-people-group"></i> Explore Teams
                             </a>
                         </li>
                         <li class="sidebar-item">
                             <a href="{% url 'edit_player_profile' %}" class="sidebar-link {% if 'edit-profile' in request.path %}active{% endif %}">
                                 <i class="fa-solid fa-id-card"></i> My Profile & Stats
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a href="{% url 'team_list' %}" class="sidebar-link {% if 'teams' in request.path %}active{% endif %}">
-                                <i class="fa-solid fa-people-group"></i> My Teams
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -147,7 +169,7 @@
                     <i class="fa-solid fa-bars fs-5"></i>
                 </button>
                 <a href="{% url 'home' %}" class="fw-bold text-decoration-none text-purple fs-5">
-                    <i class="fa-solid fa-trophy me-1"></i> Sports Tourney
+                    <i class="fa-solid fa-trophy text-warning me-1"></i> Naveen Cricket Org
                 </a>
                 {% if user.is_authenticated %}
                     <a href="{% url 'notification_list' %}" class="position-relative text-dark">
@@ -164,7 +186,7 @@
             <!-- Mobile Offcanvas Sidebar Drawer -->
             <div class="offcanvas offcanvas-start offcanvas-sidebar p-3" tabindex="-1" id="mobileSidebar">
                 <div class="offcanvas-header pb-2 border-bottom">
-                    <h5 class="offcanvas-title fw-bold text-purple"><i class="fa-solid fa-trophy me-2"></i>Sports Tourney</h5>
+                    <h5 class="offcanvas-title fw-bold text-purple"><i class="fa-solid fa-trophy text-warning me-2"></i>Naveen Cricket Org</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                 </div>
                 <div class="offcanvas-body d-flex flex-column p-0 pt-3">

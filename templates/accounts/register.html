@@ -1,63 +1,73 @@
 {% extends 'base.html' %}
 
-{% block title %}Register | Sports Tournament{% endblock %}
+{% block title %}Register | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center my-4">
     <div class="col-lg-7 col-md-9">
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="bg-navy p-4 text-center text-white">
-                <i class="fa-solid fa-user-plus text-emerald fs-1 mb-2"></i>
-                <h3 class="fw-bold mb-1">Create an Account</h3>
-                <p class="small text-slate-300 mb-0">Join Tamil Nadu's Premier Cricket Championship Network</p>
+                <i class="fa-solid fa-trophy text-warning fs-1 mb-2"></i>
+                <h3 class="fw-bold mb-1">Naveen Cricket Tournament Organization</h3>
+                <p class="small text-slate-300 mb-0">Join as a Team Captain / Owner or Cricket Player</p>
             </div>
             <div class="card-body p-4 p-md-5">
-                <form method="post" action="{% url 'register' %}">
+                <form method="post" action="{% url 'register' %}" id="regForm">
                     {% csrf_token %}
 
-                    <div class="mb-4 text-center">
-                        <label class="form-label fw-bold d-block text-navy fs-6 mb-2"><i class="fa-solid fa-user-tag text-warning me-1"></i> Account Type</label>
-                        <div class="d-flex justify-content-center gap-3">
-                            <div class="w-100">
-                                {{ form.role }}
-                            </div>
-                        </div>
-                        <small class="text-muted d-block mt-1">Select 'Cricket Player' to manage player stats & join teams, or 'Tournament Organizer' to host tournaments.</small>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-block text-navy fs-6 mb-2">
+                            <i class="fa-solid fa-user-tag text-warning me-1"></i> Register As:
+                        </label>
+                        {{ form.role }}
+                        <small class="text-muted d-block mt-1">
+                            Choose <strong>Team Captain / Owner</strong> to create your team & register for tournaments, or <strong>Cricket Player</strong> to join existing squads.
+                        </small>
+                    </div>
+
+                    <!-- Team Name for Captains -->
+                    <div class="mb-3 p-3 bg-light rounded-3 border border-warning" id="teamNameSection">
+                        <label class="form-label fw-bold text-navy">
+                            <i class="fa-solid fa-shield-halved text-warning me-1"></i> Team Name *
+                        </label>
+                        {{ form.team_name }}
+                        {% if form.team_name.errors %}<div class="text-danger small mt-1">{{ form.team_name.errors }}</div>{% endif %}
+                        <small class="text-muted d-block mt-1">Village / Club Team Name (e.g. <em>Perur Kings XI</em>, <em>Kovai Warriors</em>)</small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Full Name *</label>
+                        <label class="form-label fw-bold text-navy">Full Name *</label>
                         {{ form.full_name }}
                         {% if form.full_name.errors %}<div class="text-danger small">{{ form.full_name.errors }}</div>{% endif %}
                     </div>
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Username *</label>
+                            <label class="form-label fw-bold text-navy">Username *</label>
                             {{ form.username }}
                             {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Email Address *</label>
+                            <label class="form-label fw-bold text-navy">Email Address *</label>
                             {{ form.email }}
                             {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Mobile Number *</label>
+                        <label class="form-label fw-bold text-navy">Mobile Number *</label>
                         {{ form.phone_number }}
                         {% if form.phone_number.errors %}<div class="text-danger small">{{ form.phone_number.errors }}</div>{% endif %}
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Password *</label>
+                            <label class="form-label fw-bold text-navy">Password *</label>
                             {{ form.password }}
                             {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors }}</div>{% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Confirm Password *</label>
+                            <label class="form-label fw-bold text-navy">Confirm Password *</label>
                             {{ form.confirm_password }}
                             {% if form.confirm_password.errors %}<div class="text-danger small">{{ form.confirm_password.errors }}</div>{% endif %}
                         </div>
@@ -69,11 +79,31 @@
                 </form>
 
                 <div class="text-center mt-4 small">
-                    <span class="text-muted">Already have an account?</span>
-                    <a href="{% url 'login' %}" class="fw-bold text-emerald ms-1">Login here</a>
+                    <span class="text-muted">Already registered?</span>
+                    <a href="{% url 'login' %}" class="fw-bold text-purple ms-1">Login here</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const roleSelect = document.getElementById("id_role");
+        const teamSection = document.getElementById("teamNameSection");
+
+        function updateVisibility() {
+            if (roleSelect && roleSelect.value === "CAPTAIN") {
+                teamSection.style.display = "block";
+            } else {
+                teamSection.style.display = "none";
+            }
+        }
+
+        if (roleSelect && teamSection) {
+            roleSelect.addEventListener("change", updateVisibility);
+            updateVisibility();
+        }
+    });
+</script>
 {% endblock %}

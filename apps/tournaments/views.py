@@ -65,8 +65,8 @@ def tournament_detail_view(request, pk):
 
 @login_required
 def tournament_create_view(request):
-    if not (request.user.is_organizer_role or request.user.is_admin_role):
-        messages.error(request, "Only Tournament Organizers and Admins can create tournaments.")
+    if not request.user.is_admin_role:
+        messages.error(request, "Only the Organization Super Admin can host tournaments.")
         return redirect('tournament_list')
 
     if request.method == 'POST':

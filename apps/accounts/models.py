@@ -3,7 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     class Role(models.TextChoices):
-        ADMIN = 'ADMIN', 'Admin / System Superuser'
+        ADMIN = 'ADMIN', 'Super Admin / Organization Head'
+        CAPTAIN = 'CAPTAIN', 'Team Captain / Owner'
         ORGANIZER = 'ORGANIZER', 'Tournament Organizer'
         PLAYER = 'PLAYER', 'Cricket Player'
 
@@ -23,12 +24,17 @@ class User(AbstractUser):
         return self.role == self.Role.ADMIN or self.is_superuser
 
     @property
+    def is_captain_role(self):
+        return self.role in [self.Role.CAPTAIN, self.Role.ORGANIZER] or (hasattr(self, 'created_teams') and self.created_teams.exists())
+
+    @property
     def is_organizer_role(self):
-        return self.role == self.Role.ORGANIZER or self.is_superuser
+        # Kept for backward compatibility
+        return self.is_admin_role or self.is_captain_role
 
     @property
     def is_player_role(self):
-        return self.role == self.Role.PLAYER or not (self.is_organizer_role or self.is_admin_role)
+        return self.role == self.Role.PLAYER or not (self.is_captain_role or self.is_admin_role)
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

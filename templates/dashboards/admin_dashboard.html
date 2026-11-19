@@ -1,16 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin Dashboard | Sports Tournament{% endblock %}
+{% block title %}Super Admin Dashboard | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <h2 class="fw-bold text-navy mb-0"><i class="fa-solid fa-shield-halved text-danger me-2"></i>System Admin Dashboard</h2>
-        <p class="text-muted small mb-0">Complete system control for Tamil Nadu Sports Tournament Network.</p>
+        <h2 class="fw-bold text-navy mb-0">
+            <i class="fa-solid fa-crown text-warning me-2"></i>Naveen Cricket Tournament Organization
+        </h2>
+        <p class="text-muted small mb-0">Super Admin Console &bull; Manage tournaments, team approvals, and match scheduling.</p>
     </div>
-    <a href="/admin/" target="_blank" class="btn btn-danger rounded-pill px-4 shadow">
-        <i class="fa-solid fa-gear me-2"></i> Open Django Admin Panel
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{% url 'tournament_create' %}" class="btn btn-emerald rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-plus-circle me-1"></i> Create Tournament
+        </a>
+        <a href="/admin/" target="_blank" class="btn btn-outline-danger rounded-pill px-3 shadow-sm">
+            <i class="fa-solid fa-gear me-1"></i> Django Admin
+        </a>
+    </div>
 </div>
 
 <!-- Metrics Cards -->
@@ -24,19 +31,7 @@
                 </div>
                 <div class="stat-icon stat-icon-navy"><i class="fa-solid fa-users"></i></div>
             </div>
-            <div class="mt-2 small text-muted">Organizers: {{ total_organizers }} | Players: {{ total_players }}</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="text-muted small fw-bold text-uppercase">TN Districts</div>
-                    <div class="stat-number">{{ total_districts }}</div>
-                </div>
-                <div class="stat-icon stat-icon-emerald"><i class="fa-solid fa-map-location-dot"></i></div>
-            </div>
-            <div class="mt-2 small text-muted">All 38 Districts Active</div>
+            <div class="mt-2 small text-muted">Captains & Players in Org</div>
         </div>
     </div>
     <div class="col-md-3">
@@ -48,70 +43,85 @@
                 </div>
                 <div class="stat-icon stat-icon-gold"><i class="fa-solid fa-trophy"></i></div>
             </div>
-            <div class="mt-2 small text-muted">Clubs: {{ total_teams }} Teams</div>
+            <div class="mt-2 small text-muted">Organized by Super Admin</div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="text-muted small fw-bold text-uppercase">Matches</div>
+                    <div class="text-muted small fw-bold text-uppercase">Registered Teams</div>
+                    <div class="stat-number">{{ total_teams }}</div>
+                </div>
+                <div class="stat-icon stat-icon-emerald"><i class="fa-solid fa-shield-halved"></i></div>
+            </div>
+            <div class="mt-2 small text-muted">Village & Club Teams</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase">Matches & Fixtures</div>
                     <div class="stat-number">{{ total_matches }}</div>
                 </div>
                 <div class="stat-icon stat-icon-rose"><i class="fa-solid fa-baseball-bat-ball"></i></div>
             </div>
-            <div class="mt-2 small text-muted">Fixtures & Live Scorecards</div>
+            <div class="mt-2 small text-muted">Scheduled & Completed</div>
         </div>
     </div>
 </div>
 
-<!-- Admin Quick Action Tools -->
+<!-- Organization Admin Controls -->
 <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
-    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-sliders text-warning me-2"></i>Tamil Nadu Admin Controls</h5>
+    <h5 class="fw-bold text-navy mb-3"><i class="fa-solid fa-sliders text-warning me-2"></i>Quick Organization Controls</h5>
     <div class="row g-3">
         <div class="col-md-3">
-            <a href="/admin/locations/district/" target="_blank" class="btn btn-outline-primary w-100 p-3 rounded-3 text-start">
-                <i class="fa-solid fa-building-flag fs-3 mb-2 d-block text-primary"></i>
-                <strong class="d-block">Manage 38 Districts</strong>
-                <small class="text-muted">Add/Edit TN Districts</small>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/admin/locations/taluk/" target="_blank" class="btn btn-outline-success w-100 p-3 rounded-3 text-start">
-                <i class="fa-solid fa-map-pin fs-3 mb-2 d-block text-success"></i>
-                <strong class="d-block">Manage Taluks</strong>
-                <small class="text-muted">Revenue Divisions & Areas</small>
-            </a>
-        </div>
-        <div class="col-md-3">
-            <a href="/admin/tournaments/tournament/" target="_blank" class="btn btn-outline-warning w-100 p-3 rounded-3 text-start">
+            <a href="{% url 'tournament_create' %}" class="btn btn-outline-warning w-100 p-3 rounded-3 text-start">
                 <i class="fa-solid fa-trophy fs-3 mb-2 d-block text-warning"></i>
-                <strong class="d-block">All Tournaments</strong>
-                <small class="text-muted">System-wide CRUD</small>
+                <strong class="d-block">Host New Tournament</strong>
+                <small class="text-muted">Set dates, venue & prizes</small>
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/admin/accounts/user/" target="_blank" class="btn btn-outline-dark w-100 p-3 rounded-3 text-start">
-                <i class="fa-solid fa-user-gear fs-3 mb-2 d-block text-dark"></i>
-                <strong class="d-block">Users & Roles</strong>
-                <small class="text-muted">Organizers & Players</small>
+            <a href="{% url 'tournament_list' %}" class="btn btn-outline-success w-100 p-3 rounded-3 text-start">
+                <i class="fa-solid fa-calendar-plus fs-3 mb-2 d-block text-success"></i>
+                <strong class="d-block">Schedule Matches</strong>
+                <small class="text-muted">Create match fixtures</small>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'team_list' %}" class="btn btn-outline-primary w-100 p-3 rounded-3 text-start">
+                <i class="fa-solid fa-people-group fs-3 mb-2 d-block text-primary"></i>
+                <strong class="d-block">All Village Teams</strong>
+                <small class="text-muted">View squads and rosters</small>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{% url 'player_list' %}" class="btn btn-outline-dark w-100 p-3 rounded-3 text-start">
+                <i class="fa-solid fa-user-ninja fs-3 mb-2 d-block text-dark"></i>
+                <strong class="d-block">Players Directory</strong>
+                <small class="text-muted">All registered cricket players</small>
             </a>
         </div>
     </div>
 </div>
 
-<!-- Recent Activities Table -->
+<!-- Tournaments Table -->
 <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-    <div class="card-header bg-navy text-white p-3">
-        <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent System Activity</h5>
+    <div class="card-header bg-navy text-white p-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-trophy text-warning me-2"></i>Organization Tournaments</h5>
+        <a href="{% url 'tournament_create' %}" class="btn btn-sm btn-emerald rounded-pill">+ New Tournament</a>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Tournament Name</th>
-                    <th>District</th>
-                    <th>Organizer</th>
+                    <th>Type / Venue</th>
+                    <th>Dates</th>
+                    <th>Entry Fee</th>
+                    <th>Registered Teams</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -119,14 +129,34 @@
             <tbody>
                 {% for t in recent_tournaments %}
                     <tr>
-                        <td class="fw-bold">{{ t.name }}</td>
-                        <td><span class="badge bg-light text-dark border">{{ t.district.name }}</span></td>
-                        <td>{{ t.organizer.username }}</td>
-                        <td><span class="badge bg-emerald">{{ t.get_status_display }}</span></td>
-                        <td><a href="{% url 'tournament_detail' t.id %}" class="btn btn-sm btn-outline-dark rounded-pill">Manage</a></td>
+                        <td class="fw-bold text-navy">{{ t.name }}</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ t.get_tournament_type_display }}</span>
+                            <small class="d-block text-muted">{{ t.venue }}</small>
+                        </td>
+                        <td>
+                            <small class="fw-bold">{{ t.start_date|date:"d M Y" }}</small>
+                            <small class="text-muted d-block">to {{ t.end_date|date:"d M Y" }}</small>
+                        </td>
+                        <td><span class="fw-bold text-success">₹{{ t.entry_fee }}</span></td>
+                        <td><span class="badge bg-primary rounded-pill">{{ t.registered_teams_count }} Teams</span></td>
+                        <td>
+                            <span class="badge badge-status 
+                                {% if t.status == 'ONGOING' %}badge-ongoing
+                                {% elif t.status == 'REGISTRATION_OPEN' %}badge-registration-open
+                                {% else %}badge-upcoming{% endif %}">
+                                {{ t.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'tournament_detail' t.id %}" class="btn btn-outline-primary" title="View"><i class="fa-solid fa-eye"></i></a>
+                                <a href="{% url 'match_create' t.id %}" class="btn btn-outline-success" title="Schedule Match"><i class="fa-solid fa-calendar-plus"></i></a>
+                            </div>
+                        </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="5" class="text-center py-3">No recent activities.</td></tr>
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No tournaments organized yet. Click "Create Tournament" to get started!</td></tr>
                 {% endfor %}
             </tbody>
         </table>

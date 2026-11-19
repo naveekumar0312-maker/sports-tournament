@@ -1,27 +1,105 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ team.name }} | Sports Tournament{% endblock %}
+{% block title %}{{ team.name }} | Naveen Cricket Tournament Organization{% endblock %}
 
 {% block content %}
 <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
     <div class="p-4 p-md-5 text-dark border-bottom">
-        <div class="d-flex align-items-center">
-            <i class="fa-solid fa-shield-halved fs-1 text-warning me-3"></i>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div class="d-flex align-items-center">
+                {% if team.logo %}
+                    <img src="{{ team.logo.url }}" class="rounded-circle shadow me-3" style="width: 75px; height: 75px; object-fit: cover;" alt="">
+                {% else %}
+                    <i class="fa-solid fa-shield-halved fs-1 text-warning me-3"></i>
+                {% endif %}
+                <div>
+                    <span class="badge bg-emerald mb-1">{{ team.short_code }}</span>
+                    <h2 class="fw-bold mb-1 text-navy">{{ team.name }}</h2>
+                    <p class="small mb-0 text-muted">
+                        <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                        {{ team.district.name }} District
+                        {% if team.taluk %} &bull; {{ team.taluk.name }}{% endif %}
+                        {% if team.village %} &bull; {{ team.village.name }}{% endif %}
+                        &bull; Captain: <strong>{{ team.captain.full_name|default:team.created_by.username }}</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Player Join Action or Captain Dashboard Link -->
             <div>
-                <span class="badge bg-emerald mb-1">{{ team.short_code }}</span>
-                <h2 class="fw-bold mb-1" style="color: #111827;">{{ team.name }}</h2>
-                <p class="small mb-0" style="color: #374151;"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ team.district.name }} District</p>
+                {% if is_team_manager %}
+                    <a href="{% url 'captain_dashboard' %}" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="fa-solid fa-gauge-high me-1"></i> Captain Dashboard
+                    </a>
+                {% elif user.is_authenticated and player_profile %}
+                    {% if player_profile.current_team == team %}
+                        <span class="badge bg-success-subtle text-success border border-success px-4 py-2 rounded-pill fs-6">
+                            <i class="fa-solid fa-check-circle me-1"></i> You are in this Squad
+                        </span>
+                    {% elif user_request_status == 'PENDING' %}
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning px-4 py-2 rounded-pill fs-6">
+                            <i class="fa-regular fa-clock me-1"></i> Join Request Pending
+                        </span>
+                    {% else %}
+                        <button type="button" class="btn btn-emerald rounded-pill px-4 shadow-sm" data-bs-toggle="collapse" data-bs-target="#joinRequestCollapse">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Request to Join Squad
+                        </button>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
+
+        <!-- Join Request Collapse Box for Players -->
+        {% if user.is_authenticated and player_profile and player_profile.current_team != team and user_request_status != 'PENDING' %}
+            <div class="collapse mt-3" id="joinRequestCollapse">
+                <div class="p-3 bg-light rounded-3 border">
+                    <h6 class="fw-bold text-navy mb-2"><i class="fa-solid fa-handshake me-1 text-emerald"></i>Send Join Request to Captain {{ team.captain.full_name|default:team.created_by.username }}</h6>
+                    <form method="post" action="{% url 'send_join_request' team.id %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="message" class="form-control" placeholder="Introduce yourself (e.g. Right-hand opening batsman from Perur)" maxlength="200" required>
+                            <button class="btn btn-emerald" type="submit">Send Join Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <div class="row g-4">
     <!-- Team Roster -->
     <div class="col-lg-8">
+        <!-- Captain: Pending Join Requests -->
+        {% if is_team_manager and join_requests %}
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white border border-warning">
+                <div class="card-header bg-warning text-dark p-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-bell me-2"></i>Pending Player Join Requests</h5>
+                    <span class="badge bg-dark">{{ join_requests.count }} New</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for req in join_requests %}
+                            <div class="list-group-item p-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-navy d-block">{{ req.player.full_name }}</strong>
+                                    <small class="badge bg-light text-dark border">{{ req.player.get_playing_role_display }}</small>
+                                    {% if req.message %}<small class="d-block text-muted fst-italic mt-1">"{{ req.message }}"</small>{% endif %}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'respond_join_request' req.id 'accept' %}" class="btn btn-emerald btn-sm rounded-pill px-3">Accept</a>
+                                    <a href="{% url 'respond_join_request' req.id 'reject' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">Decline</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white">
             <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0" style="color: #111827;"><i class="fa-solid fa-users text-warning me-2"></i>Playing Squad Roster</h5>
+                <h5 class="fw-bold mb-0 text-navy"><i class="fa-solid fa-users text-warning me-2"></i>Playing Squad Roster</h5>
                 <span class="badge bg-emerald">{{ members.count }} Players</span>
             </div>
             <div class="card-body p-0">
@@ -29,28 +107,40 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="color: #111827;" class="fw-bold">Player Name</th>
-                                <th style="color: #111827;" class="fw-bold">Playing Role</th>
-                                <th style="color: #111827;" class="fw-bold">Batting</th>
-                                <th style="color: #111827;" class="fw-bold">Bowling</th>
+                                <th class="fw-bold text-navy">Player Name</th>
+                                <th class="fw-bold text-navy">Playing Role</th>
+                                <th class="fw-bold text-navy">Batting</th>
+                                <th class="fw-bold text-navy">Bowling</th>
+                                {% if is_team_manager %}
+                                    <th class="fw-bold text-navy text-end">Action</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
                             {% for player in members %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'player_profile_detail' player.id %}" class="fw-bold text-decoration-none" style="color: #111827;">
+                                        <a href="{% url 'player_profile_detail' player.id %}" class="fw-bold text-decoration-none text-navy">
                                             {{ player.full_name }}
                                         </a>
-                                        {% if player == team.captain %}<span class="badge bg-warning text-dark ms-1">C</span>{% endif %}
+                                        {% if player == team.captain %}<span class="badge bg-warning text-dark ms-1">Captain</span>{% endif %}
                                         {% if player == team.vice_captain %}<span class="badge bg-secondary text-white ms-1">VC</span>{% endif %}
                                     </td>
                                     <td><span class="badge bg-light text-dark border">{{ player.get_playing_role_display }}</span></td>
-                                    <td class="small" style="color: #374151;">{{ player.get_batting_style_display }}</td>
-                                    <td class="small" style="color: #374151;">{{ player.get_bowling_style_display }}</td>
+                                    <td class="small text-muted">{{ player.get_batting_style_display }}</td>
+                                    <td class="small text-muted">{{ player.get_bowling_style_display }}</td>
+                                    {% if is_team_manager %}
+                                        <td class="text-end">
+                                            {% if player != team.captain %}
+                                                <a href="{% url 'remove_player_from_team' team.id player.id %}" class="btn btn-sm btn-outline-danger border-0 rounded-circle" title="Remove Player" onclick="return confirm('Remove {{ player.full_name }} from squad?');">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
                                 </tr>
                             {% empty %}
-                                <tr><td colspan="4" class="text-center py-4" style="color: #6B7280;">No player members added yet.</td></tr>
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No squad players added yet.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -58,23 +148,23 @@
             </div>
         </div>
 
-        <!-- Add Player to Team Modal / Form for Team Creator -->
-        {% if user == team.created_by or user.is_admin_role %}
+        <!-- Add Player to Team for Captain/Admin -->
+        {% if is_team_manager %}
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <h5 class="fw-bold mb-3" style="color: #111827;"><i class="fa-solid fa-user-plus text-emerald me-2"></i>Recruit / Add Player to Team</h5>
+                <h5 class="fw-bold mb-3 text-navy"><i class="fa-solid fa-user-plus text-emerald me-2"></i>Directly Add Registered Player</h5>
                 <form method="post" action="{% url 'add_player_to_team' team.id %}">
                     {% csrf_token %}
                     <div class="row g-2 align-items-center">
                         <div class="col-md-8">
-                            <select name="player_id" class="form-select bg-white" required style="color: #111827;">
-                                <option value="" style="color: #111827;">-- Select Available Player --</option>
+                            <select name="player_id" class="form-select bg-white" required>
+                                <option value="">-- Select Available Player --</option>
                                 {% for p in available_players %}
-                                    <option value="{{ p.id }}" style="color: #111827;">{{ p.full_name }} ({{ p.get_playing_role_display }} - {{ p.district.name|default:"TN" }})</option>
+                                    <option value="{{ p.id }}">{{ p.full_name }} ({{ p.get_playing_role_display }} - {{ p.district.name|default:"Tamil Nadu" }})</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <button type="submit" class="btn btn-emerald w-100 rounded-pill">Add to Roster</button>
+                            <button type="submit" class="btn btn-emerald w-100 rounded-pill">Add to Squad</button>
                         </div>
                     </div>
                 </form>
@@ -85,17 +175,17 @@
     <!-- Team Tournament Registrations -->
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-            <h5 class="fw-bold mb-3" style="color: #111827;"><i class="fa-solid fa-trophy text-warning me-2"></i>Tournament History</h5>
+            <h5 class="fw-bold mb-3 text-navy"><i class="fa-solid fa-trophy text-warning me-2"></i>Tournaments Entered</h5>
             <ul class="list-group list-group-flush">
                 {% for reg in registrations %}
                     <li class="list-group-item px-0 py-2 border-bottom bg-white">
-                        <a href="{% url 'tournament_detail' reg.tournament.id %}" class="fw-bold text-decoration-none d-block" style="color: #111827;">
+                        <a href="{% url 'tournament_detail' reg.tournament.id %}" class="fw-bold text-decoration-none d-block text-navy">
                             {{ reg.tournament.name }}
                         </a>
-                        <small style="color: #374151;"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ reg.tournament.district.name }}</small>
+                        <small class="text-muted"><i class="fa-solid fa-location-dot text-danger me-1"></i>{{ reg.tournament.district.name }}</small>
                     </li>
                 {% empty %}
-                    <li class="list-group-item px-0 py-3 bg-white" style="color: #6B7280;">Not registered in any tournaments yet.</li>
+                    <li class="list-group-item px-0 py-3 bg-white text-muted">Not registered in any tournaments yet.</li>
                 {% endfor %}
             </ul>
         </div>

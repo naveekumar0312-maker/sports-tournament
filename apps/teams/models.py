@@ -44,3 +44,24 @@ class TournamentRegistration(models.Model):
 
     def __str__(self):
         return f"{self.team.name} in {self.tournament.name} ({self.get_status_display()})"
+
+
+class TeamJoinRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending Approval'
+        ACCEPTED = 'ACCEPTED', 'Accepted'
+        REJECTED = 'REJECTED', 'Rejected'
+
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='join_requests')
+    player = models.ForeignKey('players.PlayerProfile', on_delete=models.CASCADE, related_name='team_join_requests')
+    message = models.CharField(max_length=255, blank=True, null=True, help_text="e.g. Opening Batsman from Perur")
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('team', 'player')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.player.full_name} -> {self.team.name} ({self.get_status_display()})"

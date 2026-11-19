@@ -9,6 +9,8 @@ from accounts.views import (
     admin_dashboard_view, organizer_dashboard_view, player_dashboard_view
 )
 # pyrefly: ignore [missing-import]
+from teams.views import captain_dashboard_view
+# pyrefly: ignore [missing-import]
 from locations.views import taluks_api_view, villages_api_view
 
 urlpatterns = [
@@ -26,6 +28,7 @@ urlpatterns = [
     
     # Role-Based Dashboards
     path('dashboard/', player_dashboard_view, name='player_dashboard'),
+    path('captain/dashboard/', captain_dashboard_view, name='captain_dashboard_direct'),
     path('organizer/dashboard/', organizer_dashboard_view, name='organizer_dashboard'),
     path('dashboard/admin/', admin_dashboard_view, name='admin_dashboard'),
 

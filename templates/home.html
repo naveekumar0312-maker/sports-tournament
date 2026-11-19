@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Sports Tournament | Tamil Nadu Cricket Championship{% endblock %}
+{% block title %}Naveen Cricket Tournament Organization | Official Championship Portal{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <div class="hero-section text-center text-md-start mb-5">
     <div class="row align-items-center">
         <div class="col-lg-7">
-            <span class="badge bg-emerald mb-3 px-3 py-2 fs-6 rounded-pill"><i class="fa-solid fa-map-pin me-1"></i> 38 Districts of Tamil Nadu</span>
-            <h1 class="hero-title mb-3">Tamil Nadu's Official <br><span class="text-warning">Cricket Tournament</span> Portal</h1>
-            <p class="hero-subtitle mb-4">Register teams, manage live cricket fixtures, publish ball-by-ball scorecards, award cash prizes, and connect cricket players across all 38 revenue districts of Tamil Nadu.</p>
+            <span class="badge bg-emerald mb-3 px-3 py-2 fs-6 rounded-pill"><i class="fa-solid fa-trophy me-1"></i> Official Cricket Organization</span>
+            <h1 class="hero-title mb-3">Naveen Cricket <br><span class="text-warning">Tournament Organization</span></h1>
+            <p class="hero-subtitle mb-4">Official platform for Village Teams & Cricket Clubs. Team Captains register squads and recruit players, Cricket Players join active teams, and Super Admin manages match fixtures and live scoring.</p>
             <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
                 <a href="{% url 'tournament_list' %}" class="btn btn-gold btn-lg px-4 shadow">
                     <i class="fa-solid fa-baseball-bat-ball me-2"></i> Browse Tournaments
                 </a>
                 <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4">
-                    <i class="fa-solid fa-user-plus me-2"></i> Join as Player / Organizer
+                    <i class="fa-solid fa-user-plus me-2"></i> Register as Captain / Player
                 </a>
             </div>
         </div>
