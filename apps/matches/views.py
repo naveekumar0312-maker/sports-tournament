@@ -107,12 +107,47 @@ def match_update_score_view(request, pk):
             match=match, player=match.current_bowler, defaults={'team': bowling_team}
         )
 
+    # Available batting team players who are NOT dismissed yet
+    batting_team = match.current_batting_team or match.team_a
+    bowling_team = match.team_b if batting_team == match.team_a else match.team_a
+
+    batting_team_players = PlayerProfile.objects.filter(current_team=batting_team)
+    bowling_team_players = PlayerProfile.objects.filter(current_team=bowling_team)
+
+    # Dismissed players list
+    dismissed_player_ids = PlayerMatchPerformance.objects.filter(
+        match=match,
+        team=batting_team
+    ).exclude(
+        batting_status__in=[
+            PlayerMatchPerformance.BattingStatus.DID_NOT_BAT,
+            PlayerMatchPerformance.BattingStatus.NOT_OUT
+        ]
+    ).values_list('player_id', flat=True)
+
+    available_next_batsmen = batting_team_players.exclude(id__in=dismissed_player_ids)
+    if match.non_striker:
+        available_next_batsmen = available_next_batsmen.exclude(id=match.non_striker.id)
+
+    # Check if over is completed (current_overs has .0, e.g. 1.0, 2.0 and current_overs > 0)
+    current_ov_val = float(match.current_overs)
+    is_over_complete = (current_ov_val > 0) and (round((current_ov_val - int(current_ov_val)) * 10) == 0)
+
+    needs_new_batsman = (match.striker is None)
+    needs_new_bowler = is_over_complete or (match.current_bowler is None)
+
     return render(request, 'matches/match_score_form.html', {
         'form': form,
         'match': match,
         'performances': performances,
         'team_a_players': team_a_players,
         'team_b_players': team_b_players,
+        'batting_team_players': batting_team_players,
+        'bowling_team_players': bowling_team_players,
+        'available_next_batsmen': available_next_batsmen,
+        'needs_new_batsman': needs_new_batsman,
+        'needs_new_bowler': needs_new_bowler,
+        'is_over_complete': is_over_complete,
         'striker_perf': striker_perf,
         'non_striker_perf': non_striker_perf,
         'bowler_perf': bowler_perf,
@@ -275,8 +310,12 @@ def live_ball_record_view(request, pk):
                 # Over completed: swap strike
                 if match.striker and match.non_striker:
                     match.striker, match.non_striker = match.non_striker, match.striker
+                # Over finished! Clear current_bowler so new bowler must be chosen
+                match.current_bowler = None
+                over_finished = True
             else:
                 match.current_overs = float(tot_int + (tot_balls / 10.0))
+                over_finished = False
 
         # Recent balls ribbon
         recent_list = [b.strip() for b in match.recent_balls.split(',') if b.strip()]
@@ -293,7 +332,58 @@ def live_ball_record_view(request, pk):
         match.status = Match.Status.LIVE
         match.save()
 
-        messages.success(request, f"Ball recorded: {action}! Total: {score_str}")
+        if action == 'W':
+            messages.warning(request, f"Wicket down! {score_str}. Select the incoming new batsman below.")
+        elif 'over_finished' in locals() and over_finished:
+            messages.info(request, f"Over {int(match.current_overs)} completed! {score_str}. Select new bowler for the next over.")
+        else:
+            messages.success(request, f"Ball recorded: {action}! Total: {score_str}")
+        return redirect('match_update_score', pk=pk)
+
+@login_required(login_url='login')
+def set_new_batsman_view(request, pk):
+    match = get_object_or_404(Match, pk=pk)
+    if not (request.user == match.tournament.organizer or request.user.is_admin_role):
+        messages.error(request, "Permission denied.")
+        return redirect('match_detail', pk=pk)
+
+    if request.method == 'POST':
+        batsman_id = request.POST.get('new_batsman_id')
+        if batsman_id:
+            new_batsman = PlayerProfile.objects.filter(pk=batsman_id).first()
+            if new_batsman:
+                match.striker = new_batsman
+                match.save()
+                PlayerMatchPerformance.objects.get_or_create(
+                    match=match, player=new_batsman,
+                    defaults={
+                        'team': match.current_batting_team or match.team_a,
+                        'batting_status': PlayerMatchPerformance.BattingStatus.NOT_OUT
+                    }
+                )
+                messages.success(request, f"New batsman {new_batsman.full_name} is on strike!")
+        return redirect('match_update_score', pk=pk)
+
+@login_required(login_url='login')
+def set_new_bowler_view(request, pk):
+    match = get_object_or_404(Match, pk=pk)
+    if not (request.user == match.tournament.organizer or request.user.is_admin_role):
+        messages.error(request, "Permission denied.")
+        return redirect('match_detail', pk=pk)
+
+    if request.method == 'POST':
+        bowler_id = request.POST.get('new_bowler_id')
+        if bowler_id:
+            new_bowler = PlayerProfile.objects.filter(pk=bowler_id).first()
+            if new_bowler:
+                match.current_bowler = new_bowler
+                match.save()
+                bowling_team = match.team_b if match.current_batting_team == match.team_a else match.team_a
+                PlayerMatchPerformance.objects.get_or_create(
+                    match=match, player=new_bowler,
+                    defaults={'team': bowling_team}
+                )
+                messages.success(request, f"New bowler {new_bowler.full_name} assigned for this over!")
         return redirect('match_update_score', pk=pk)
 
 @login_required(login_url='login')

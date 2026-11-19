@@ -130,6 +130,60 @@
                     </form>
                 </div>
 
+                <!-- Prompt 1: WICKET DOWN! Choose Incoming Batsman -->
+                {% if needs_new_batsman %}
+                <div class="alert alert-danger border-danger border-2 rounded-4 p-4 mb-4 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-triangle-exclamation fs-3 text-danger"></i>
+                        <h5 class="fw-bold text-danger mb-0">WICKET FALLEN! Select Incoming Batsman</h5>
+                    </div>
+                    <p class="small text-dark mb-3">Previous batsman was dismissed! Choose who comes in to bat next on strike:</p>
+                    <form method="post" action="{% url 'match_set_new_batsman' match.id %}" class="row g-2 align-items-center">
+                        {% csrf_token %}
+                        <div class="col-md-7">
+                            <select name="new_batsman_id" class="form-select form-select-lg fw-bold" required>
+                                <option value="">-- Select Incoming Next Batsman --</option>
+                                {% for p in available_next_batsmen %}
+                                    <option value="{{ p.id }}">{{ p.full_name }} ({{ p.get_playing_role_display }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold shadow">
+                                <i class="fa-solid fa-person-walking-arrow-right me-1"></i> Send Batsman to Crease
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
+                <!-- Prompt 2: OVER COMPLETED! Choose New Bowler -->
+                {% if not needs_new_batsman and needs_new_bowler %}
+                <div class="alert alert-warning border-warning border-2 rounded-4 p-4 mb-4 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="fa-solid fa-circle-check fs-3 text-warning-emphasis"></i>
+                        <h5 class="fw-bold text-dark mb-0">OVER COMPLETED! Select Bowler for Next Over</h5>
+                    </div>
+                    <p class="small text-dark mb-3">Previous over has finished. Select the new bowler from opposite bowling team to bowl the next 6 balls:</p>
+                    <form method="post" action="{% url 'match_set_new_bowler' match.id %}" class="row g-2 align-items-center">
+                        {% csrf_token %}
+                        <div class="col-md-7">
+                            <select name="new_bowler_id" class="form-select form-select-lg fw-bold" required>
+                                <option value="">-- Select New Bowler --</option>
+                                {% for p in bowling_team_players %}
+                                    <option value="{{ p.id }}" {% if match.current_bowler.id == p.id %}selected{% endif %}>{{ p.full_name }} ({{ p.get_bowling_style_display }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <button type="submit" class="btn btn-warning text-dark btn-lg w-100 rounded-pill fw-bold shadow">
+                                <i class="fa-solid fa-bowling-ball me-1"></i> Start Next Over
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
                 <!-- On-Crease Live Status (Striker, Non-Striker, Bowler Stats) -->
                 {% if match.striker or match.current_bowler %}
                 <div class="row g-3 mb-4">
@@ -218,26 +272,28 @@
                 </div>
 
                 <!-- 1-Click Real-time Scoring Buttons (0, 1, 2, 3, 4, 6, W, WD, NB) -->
+                {% if not needs_new_batsman and not needs_new_bowler %}
                 <div class="p-4 rounded-4 bg-light border text-center">
                     <h6 class="fw-bold text-navy mb-3">
                         <i class="fa-solid fa-hand-pointer text-warning me-2"></i>1-Click Real-time Score Update:
                     </h6>
                     <form method="post" action="{% url 'match_record_ball' match.id %}" class="d-flex justify-content-center gap-2 flex-wrap">
                         {% csrf_token %}
-                        <button type="submit" name="ball_action" value="0" class="btn btn-outline-dark rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">0</button>
-                        <button type="submit" name="ball_action" value="1" class="btn btn-outline-primary rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">1</button>
-                        <button type="submit" name="ball_action" value="2" class="btn btn-outline-primary rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">2</button>
-                        <button type="submit" name="ball_action" value="3" class="btn btn-outline-primary rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 1.1rem;">3</button>
+                        <button type="submit" name="ball_action" value="0" class="btn btn-outline-dark rounded-circle fw-bold shadow-xs" style="width: 52px; height: 52px; font-size: 1.1rem;">0</button>
+                        <button type="submit" name="ball_action" value="1" class="btn btn-outline-primary rounded-circle fw-bold shadow-xs" style="width: 52px; height: 52px; font-size: 1.1rem;">1</button>
+                        <button type="submit" name="ball_action" value="2" class="btn btn-outline-primary rounded-circle fw-bold shadow-xs" style="width: 52px; height: 52px; font-size: 1.1rem;">2</button>
+                        <button type="submit" name="ball_action" value="3" class="btn btn-outline-primary rounded-circle fw-bold shadow-xs" style="width: 52px; height: 52px; font-size: 1.1rem;">3</button>
                         <button type="submit" name="ball_action" value="4" class="btn btn-primary rounded-circle fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">4</button>
                         <button type="submit" name="ball_action" value="6" class="btn btn-success rounded-circle fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">6</button>
                         <button type="submit" name="ball_action" value="W" class="btn btn-danger rounded-circle fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">W</button>
-                        <button type="submit" name="ball_action" value="WD" class="btn btn-warning rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 0.9rem;">Wd</button>
-                        <button type="submit" name="ball_action" value="NB" class="btn btn-warning rounded-circle fw-bold" style="width: 52px; height: 52px; font-size: 0.9rem;">Nb</button>
+                        <button type="submit" name="ball_action" value="WD" class="btn btn-warning rounded-circle fw-bold shadow-xs" style="width: 52px; height: 52px; font-size: 0.9rem;">Wd</button>
+                        <button type="submit" name="ball_action" value="NB" class="btn btn-warning rounded-circle fw-bold shadow-xs" style="width: 52px; height: 52px; font-size: 0.9rem;">Nb</button>
                     </form>
                     <small class="text-muted d-block mt-2">
                         Clicking 1 or 3 runs automatically rotates strike! 4s and 6s update strike rate immediately.
                     </small>
                 </div>
+                {% endif %}
                 {% endif %}
             </div>
         </div>
